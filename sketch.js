@@ -9,7 +9,6 @@ let secondLevelComplete = false;
 let thirdLevelComplete = false;
 let socialBattery = 100;
 
-
 // 0 = path
 // 1 = wall
 // 2 = start
@@ -139,11 +138,48 @@ class Mover {
 
 let movers = [];
 
+let wallExpansion = [];
+
+function initWallExpansion() {
+  for (let r = 0; r < ROWS; r++) {
+    wallExpansion[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      wallExpansion[r][c] = 0;
+    }
+  }
+}
+
 function tileCenter(col, row, offX, offY) {
   return {
     x: offX + col * tileSize + tileSize / 2,
     y: offY + row * tileSize + tileSize / 2
   };
+}
+
+const WALL_TRIGGER_DIST = 2.5; // tiles away to start expanding
+const WALL_MAX_EXPAND = 12;    // max pixels to expand inward (tune this)
+const WALL_EXPAND_SPEED = 0.04;
+const WALL_SHRINK_SPEED = 0.02;
+
+function updateWallExpansion(offX, offY) {
+  let playerCol = (player.x - offX) / tileSize;
+  let playerRow = (player.y - offY) / tileSize;
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] !== 1) continue; // only walls
+
+      let d = dist(playerCol, playerRow, c + 0.5, r + 0.5);
+      let target = d < WALL_TRIGGER_DIST ? 1 : 0;
+
+      // Lerp toward target
+      if (wallExpansion[r][c] < target) {
+        wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, 1);
+      } else {
+        wallExpansion[r][c] = max(wallExpansion[r][c] - WALL_SHRINK_SPEED, 0);
+      }
+    }
+  }
 }
 
 function setup() {
@@ -162,6 +198,8 @@ function setup() {
     }
   }
 }
+
+  initWallExpansion();
 
   let c1 = tileCenter(1, 1, offX, offY);
   movers.push(new Mover(c1.x, c1.y));
@@ -189,10 +227,19 @@ function draw() {
   const offX = (width - COLS * tileSize) / 2;
   const offY = (height - ROWS * tileSize) / 2;
 
+  updateWallExpansion(offX, offY);
   drawMaze();
   player.update(offX, offY);
   player.draw();
   drawSocialBar();
+  // Check collision with enemies
+  for (let m of movers) {
+  let d = dist(player.x, player.y, m.x, m.y);
+  if (d < tileSize * 0.6) {
+    socialBattery -= 0.5;  // drain battery
+  }
+}
+
 }
 
 function keyPressed() {
@@ -220,6 +267,9 @@ function drawStartScreen() {
 }
 
 function drawMaze() {
+  const offSetX = (width - COLS * tileSize) / 2;
+  const offSetY = (height - ROWS * tileSize) / 2;
+
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
       let tile = maze[row][col];
@@ -228,39 +278,40 @@ function drawMaze() {
 
       if (tile === 1) {
         fill(23, 53, 71); // wall
-      } else if (tile === 0) {
-        fill(121, 164, 166); // path
-      } else if (tile === 2) {
-        fill(215, 240, 201); // start
-      } else if (tile === 3) {
-        fill(35, 107, 112); // end
+        let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
+        rect(
+          col * tileSize + offSetX - expand,
+          row * tileSize + offSetY - expand,
+          tileSize + expand * 2,
+          tileSize + expand * 2
+        );
+      } else {
+        if (tile === 0) fill(121, 164, 166);
+        else if (tile === 2) fill(215, 240, 201);
+        else if (tile === 3) fill(35, 107, 112);
+        rect(col * tileSize + offSetX, row * tileSize + offSetY, tileSize, tileSize);
       }
-
-      const offSetX = (width - COLS * tileSize) / 2;
-      const offSetY = (height - ROWS * tileSize) / 2;
-
-      rect(
-        col * tileSize + offSetX,
-        row * tileSize + offSetY,
-        tileSize,
-        tileSize,
-      );
     }
-
-    fill(255);
-    textAlign(LEFT, TOP);
-    textFont("Monospace");
-    textSize(12);
-    text("LVL 1: Make your way to school!", 50, 20);
-    drawSocialBar();
   }
 
-  const offX = (width - COLS * tileSize) / 2;
-  const offY = (height - ROWS * tileSize) / 2;
+  fill(255);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textSize(12);
+  text("LVL 1: Make your way to school!", 50, 20);
+  drawSocialBar();
+
+  const offX = offSetX;
+  const offY = offSetY;
 
   for (let m of movers) {
     m.update(offX, offY);
     m.draw();
+  }
+
+  if (socialBattery <= 0) {
+    socialBattery = 0;
+    gameOver = true;
   }
 }
 
@@ -294,13 +345,21 @@ function drawLoseScreen() {
 function restartGame() {
   socialBattery = 100;
   gameOver = false;
-  thoughtVisible = false;
-  lastThoughtTime = 0;
 
-  // Reset player position if needed
-  blobX = 400;
-  blobY = 300;
+  const offX = (width - COLS * tileSize) / 2;
+  const offY = (height - ROWS * tileSize) / 2;
+
+  // Reset player to start tile
+  outer:
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] === 2) {
+        let pos = tileCenter(c, r, offX, offY);
+        player.x = pos.x;
+        player.y = pos.y;
+        break outer;
+      }
+    }
+  }
 }
-
-
 
