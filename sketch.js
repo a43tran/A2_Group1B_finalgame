@@ -414,6 +414,7 @@ function drawMaze() {
 
 function drawSocialBar() {
   textAlign(RIGHT, TOP);
+  noStroke();
   fill(255);
   textSize(12);
   text("Social Battery", 550, 20);
