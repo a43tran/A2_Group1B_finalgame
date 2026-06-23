@@ -297,8 +297,8 @@ function draw() {
 
   if (anxietyEffect) {
     translate(
-      random(-3, 3),
-      random(-3, 3)
+      random(-1, 1),
+      random(-1, 1)
     );
 }
   updateWallExpansion(offX, offY);
