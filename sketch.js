@@ -29,7 +29,6 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
-
 let player;
 
 class Player {
@@ -39,23 +38,35 @@ class Player {
     this.speed = 2.5;
     this.vx = 0;
     this.vy = 0;
+    this.facing = "down"; // default direction
+    this.frame = 0; // current animation frame
   }
 
   update(offX, offY) {
-    // Read WASD input
     let inputX = 0;
     let inputY = 0;
-    if (keyIsDown(65)) inputX = -1; // A
-    if (keyIsDown(68)) inputX =  1; // D
-    if (keyIsDown(87)) inputY = -1; // W
-    if (keyIsDown(83)) inputY =  1; // S
+    if (keyIsDown(65)) inputX = -1;
+    if (keyIsDown(68)) inputX = 1;
+    if (keyIsDown(87)) inputY = -1;
+    if (keyIsDown(83)) inputY = 1;
 
-    // Prefer one axis at a time (no diagonal)
-    if (inputX !== 0) { this.vx = inputX; this.vy = 0; }
-    else if (inputY !== 0) { this.vx = 0; this.vy = inputY; }
-    else { this.vx = 0; this.vy = 0; }
+    if (inputX !== 0) {
+      this.vx = inputX;
+      this.vy = 0;
+    } else if (inputY !== 0) {
+      this.vx = 0;
+      this.vy = inputY;
+    } else {
+      this.vx = 0;
+      this.vy = 0;
+    }
 
-    // Try to move, check the leading edge for wall collision
+    // Track facing direction for sprite row
+    if (this.vx === 1) this.facing = "right";
+    if (this.vx === -1) this.facing = "left";
+    if (this.vy === -1) this.facing = "up";
+    if (this.vy === 1) this.facing = "down";
+
     let radius = tileSize * 0.3;
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
@@ -75,9 +86,23 @@ class Player {
   }
 
   draw() {
-    fill(255, 100, 80);   // pick any colour you like
-    noStroke();
-    ellipse(this.x, this.y, tileSize * 0.7);
+    let row = SPRITE.rows[this.facing];
+    let frameW = SPRITE.frameWidth;
+    let frameH = SPRITE.frameHeight;
+
+    // Advance animation frame only when moving
+    if (this.vx !== 0 || this.vy !== 0) {
+      this.frame = (this.frame + 1) % (SPRITE.numFrames * SPRITE.animSpeed);
+    }
+    let col = floor(this.frame / SPRITE.animSpeed);
+
+    let srcX = col * frameW;
+    let srcY = row * frameH;
+    let drawW = frameW * SPRITE.scale;
+    let drawH = frameH * SPRITE.scale;
+
+    imageMode(CENTER);
+    image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
   }
 }
 
@@ -96,7 +121,7 @@ class Mover {
     let nextY = this.y + this.vy * this.speed;
 
     let radius = tileSize * 0.25;
-    
+
     let checkX = nextX + this.vx * radius;
     let checkY = nextY + this.vy * radius;
 
@@ -152,12 +177,12 @@ function initWallExpansion() {
 function tileCenter(col, row, offX, offY) {
   return {
     x: offX + col * tileSize + tileSize / 2,
-    y: offY + row * tileSize + tileSize / 2
+    y: offY + row * tileSize + tileSize / 2,
   };
 }
 
 const WALL_TRIGGER_DIST = 2.5; // tiles away to start expanding
-const WALL_MAX_EXPAND = 12;    // max pixels to expand inward (tune this)
+const WALL_MAX_EXPAND = 12; // max pixels to expand inward (tune this)
 const WALL_EXPAND_SPEED = 0.04;
 const WALL_SHRINK_SPEED = 0.02;
 
@@ -182,22 +207,45 @@ function updateWallExpansion(offX, offY) {
   }
 }
 
+const SPRITE = {
+  frameWidth: 75,
+  frameHeight: 150,
+  numFrames: 4,
+  animSpeed: 20,
+  scale: 0.5,
+  rows: {
+    down: 0,
+    up: 1,
+    right: 2,
+    left: 3,
+  },
+  offsets: {
+    down: { x: 0, y: 0 },
+    up: { x: 0, y: 0 },
+    right: { x: 0.1, y: 10 },
+    left: { x: 2.2, y: 20 },
+  },
+};
+
+function preload() {
+  character = loadImage("assets/images/character.png");
+}
+
 function setup() {
   createCanvas(800, 600);
 
   const offX = (width - COLS * tileSize) / 2;
   const offY = (height - ROWS * tileSize) / 2;
 
-  outer:
-  for (let r = 0; r < ROWS; r++) {
-  for (let c = 0; c < COLS; c++) {
-    if (maze[r][c] === 2) {
-      let pos = tileCenter(c, r, offX, offY);
-      player = new Player(pos.x, pos.y);
-      break outer;
+  outer: for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] === 2) {
+        let pos = tileCenter(c, r, offX, offY);
+        player = new Player(pos.x, pos.y);
+        break outer;
+      }
     }
   }
-}
 
   initWallExpansion();
 
@@ -225,8 +273,8 @@ function draw() {
   }
 
   if (firstLevelComplete) {
-  drawFirstLevelCompleteScreen();
-  return;
+    drawFirstLevelCompleteScreen();
+    return;
   }
 
   const offX = (width - COLS * tileSize) / 2;
@@ -241,17 +289,16 @@ function draw() {
   let playerRow = floor((player.y - offY) / tileSize);
 
   if (maze[playerRow][playerCol] === 3) {
-  firstLevelComplete = true;
+    firstLevelComplete = true;
   }
   drawSocialBar();
   // Check collision with enemies
   for (let m of movers) {
-  let d = dist(player.x, player.y, m.x, m.y);
-  if (d < tileSize * 0.6) {
-    socialBattery -= 0.5;  // drain battery
+    let d = dist(player.x, player.y, m.x, m.y);
+    if (d < tileSize * 0.6) {
+      socialBattery -= 0.5; // drain battery
+    }
   }
-}
-
 }
 
 function keyPressed() {
@@ -263,7 +310,7 @@ function keyPressed() {
     if (gameOver) restartGame();
   }
   if (key === "n" || key === "N") {
-  if (levelFirstComplete) loadSecondLevel();
+    if (firstLevelComplete) loadSecondLevel();
   }
 }
 
@@ -298,13 +345,18 @@ function drawMaze() {
           col * tileSize + offSetX - expand,
           row * tileSize + offSetY - expand,
           tileSize + expand * 2,
-          tileSize + expand * 2
+          tileSize + expand * 2,
         );
       } else {
         if (tile === 0) fill(121, 164, 166);
         else if (tile === 2) fill(215, 240, 201);
         else if (tile === 3) fill(35, 107, 112);
-        rect(col * tileSize + offSetX, row * tileSize + offSetY, tileSize, tileSize);
+        rect(
+          col * tileSize + offSetX,
+          row * tileSize + offSetY,
+          tileSize,
+          tileSize,
+        );
       }
     }
   }
@@ -365,8 +417,7 @@ function restartGame() {
   const offY = (height - ROWS * tileSize) / 2;
 
   // Reset player to start tile
-  outer:
-  for (let r = 0; r < ROWS; r++) {
+  outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
         let pos = tileCenter(c, r, offX, offY);
