@@ -7,6 +7,11 @@ let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
 let socialBattery = 100;
+let blobX = 400;
+let blobY = 300;
+let currentThought = "";
+let thoughtVisible = false;
+let lastThoughtTime = 0;
 
 // 0 = path
 // 1 = wall
@@ -27,64 +32,14 @@ let maze = [
   [1, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
+let negativeThoughts = [
+  "Everyone is judging me.",
+  "I don't belong here.",
+  "What if I embarrass myself?",
+  "They're staring at me.",
+  "I can't do this."
+];
 
-class Mover {
-  constructor(x, y, speed = 1.5) {
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
-
-    // Start with a random direction
-    this.vx = random([-1, 1, 0, 0]);
-    this.vy = this.vx === 0 ? random([-1, 1]) : 0;
-  }
-
-  update(offX, offY) {
-    // Predict next position
-    let nextX = this.x + this.vx * this.speed;
-    let nextY = this.y + this.vy * this.speed;
-
-    // Convert pixel → tile index
-    let col = floor((nextX - offX) / tileSize);
-    let row = floor((nextY - offY) / tileSize);
-
-    // Check bounds
-    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
-      this.pickNewDirection();
-      return;
-    }
-
-    // Check if next tile is walkable
-    let tile = maze[row][col];
-    if (tile === 0 || tile === 2 || tile === 3) {
-      // Move normally
-      this.x = nextX;
-      this.y = nextY;
-    } else {
-      // Hit a wall → choose new direction
-      this.pickNewDirection();
-    }
-  }
-
-  pickNewDirection() {
-    let dirs = [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ];
-    let d = random(dirs);
-    this.vx = d[0];
-    this.vy = d[1];
-  }
-
-  draw() {
-    fill(255, 80, 80);
-    ellipse(this.x, this.y, tileSize * 0.5);
-  }
-}
-
-let movers = [];
 
 function tileCenter(col, row, offX, offY) {
   return {
@@ -95,18 +50,6 @@ function tileCenter(col, row, offX, offY) {
 
 function setup() {
   createCanvas(800, 600);
-
-  const offX = (width - COLS * tileSize) / 2;
-  const offY = (height - ROWS * tileSize) / 2;
-
-  let c1 = tileCenter(1, 1, offX, offY);
-  movers.push(new Mover(c1.x, c1.y));
-
-  let c2 = tileCenter(6, 2, offX, offY);
-  movers.push(new Mover(c1.x, c1.y));
-
-  let c3 = tileCenter(10, 3, offX, offY);
-  movers.push(new Mover(c2.x, c2.y));
 }
 
 function draw() {
@@ -116,6 +59,17 @@ function draw() {
   } else {
     drawStartScreen();
   }
+  if (gameStarted) {
+  drawMaze();
+  drawBlurryBlackBall(300, 250);
+  if (!thoughtVisible && millis() - lastThoughtTime > 2000) {
+    spawnNegativeThought();
+  }
+
+  drawNegativeThought();
+  drawSocialBar();
+}
+checkNegativeThoughtCollision();
 }
 
 function keyPressed() {
@@ -173,14 +127,6 @@ function drawMaze() {
     text("LVL 1: Make your way to school!", 50, 20);
     drawSocialBar();
   }
-
-  const offX = (width - COLS * tileSize) / 2;
-  const offY = (height - ROWS * tileSize) / 2;
-
-  for (let m of movers) {
-    m.update(offX, offY);
-    m.draw();
-  }
 }
 
 function drawSocialBar() {
@@ -193,4 +139,70 @@ function drawSocialBar() {
 
   fill(100, 220, 120);
   rect(560, 15, socialBattery * 1.9, 20);
+}
+
+
+function drawBlob() {
+
+  fill(0);
+  ellipse(blobX, blobY, 40, 40);
+
+  fill(255);
+  textSize(10);
+  textAlign(CENTER);
+  text("Everyone is\njudging me", blobX, blobY + 4);
+}
+
+function spawnNegativeThought() {
+  thoughtX = random(100, width - 100);
+  thoughtY = random(100, height - 100);
+  currentThought = random(negativeThoughts);
+  thoughtVisible = true;
+  lastThoughtTime = millis();
+}
+
+function drawNegativeThought() {
+  if (thoughtVisible) {
+    fill(0);
+    ellipse(thoughtX, thoughtY, 45, 45);
+
+    fill(0);
+    textSize(12);
+    textAlign(CENTER);
+    text(currentThought, thoughtX, thoughtY - 35);
+
+    if (millis() - lastThoughtTime > 3000) {
+      thoughtVisible = false;
+    }
+  }
+}
+
+function checkNegativeThoughtCollision() {
+  if (thoughtVisible) {
+    let d = dist(playerX, playerY, thoughtX, thoughtY);
+
+    if (d < 35) {
+      socialBattery -= 10;
+      thoughtVisible = false;
+    }
+  }
+}
+
+function drawBlurryBlackBall(x, y) {
+  noStroke();
+
+  fill(0, 10);
+  ellipse(x, y, 150, 150);
+
+  fill(0, 20);
+  ellipse(x, y, 120, 120);
+
+  fill(0, 35);
+  ellipse(x, y, 95, 95);
+
+  fill(0, 55);
+  ellipse(x, y, 70, 70);
+
+  fill(0);
+  ellipse(x, y, 45, 45);
 }
