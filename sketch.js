@@ -224,6 +224,11 @@ function draw() {
     return;
   }
 
+  if (firstLevelComplete) {
+  drawFirstLevelCompleteScreen();
+  return;
+  }
+
   const offX = (width - COLS * tileSize) / 2;
   const offY = (height - ROWS * tileSize) / 2;
 
@@ -231,6 +236,13 @@ function draw() {
   drawMaze();
   player.update(offX, offY);
   player.draw();
+  // Check if player reached the end tile
+  let playerCol = floor((player.x - offX) / tileSize);
+  let playerRow = floor((player.y - offY) / tileSize);
+
+  if (maze[playerRow][playerCol] === 3) {
+  firstLevelComplete = true;
+  }
   drawSocialBar();
   // Check collision with enemies
   for (let m of movers) {
@@ -249,6 +261,9 @@ function keyPressed() {
 
   if (key === "r" || key === "R") {
     if (gameOver) restartGame();
+  }
+  if (key === "n" || key === "N") {
+  if (levelFirstComplete) loadSecondLevel();
   }
 }
 
@@ -363,3 +378,16 @@ function restartGame() {
   }
 }
 
+function drawFirstLevelCompleteScreen() {
+  fill(0, 0, 0, 180);
+  rect(0, 0, width, height);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  textSize(60);
+  text("Level 1 Complete!", width / 2, height / 2 - 40);
+
+  textSize(20);
+  text("Press N to continue", width / 2, height / 2 + 20);
+}
