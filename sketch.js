@@ -6,6 +6,8 @@ let gameStarted = false;
 let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
+let socialbattery= 100;
+
 
 // 0 = path
 // 1 = wall
@@ -93,13 +95,21 @@ function drawMaze() {
     textFont("Monospace");
     textStyle("BOLD");
     textSize(12);
-    text("LEVEL 1: Make your way to school!", 50, 20);
+    text("LVL 1: Make your way to school!", 50, 20);
     drawSocialBar();
   }
 }
 
 function drawSocialBar() {
-  textAlign(RIGHT, TOP);
-  text("Social Battery Bar", 550, 20);
+  textAlign(RIGHT, Top);
+  fill (255);
+  text ("Social Battery, 550, 20");
+
+  fill(80);
   rect(560, 15, 190, 20);
+
+  fill(100, 220, 120);
+  rect(560, 15, socialBattery * 1.9, 20);
 }
+
+  
