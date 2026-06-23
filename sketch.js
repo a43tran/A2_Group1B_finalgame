@@ -10,6 +10,12 @@ let thirdLevelComplete = false;
 let socialBattery = 100;
 let anxietyEffect = false;
 
+//camera variables
+let camX = 0;
+let camY = 0;
+const CAM_SMOOTHING = 0.1;
+
+
 // 0 = path
 // 1 = wall
 // 2 = start
@@ -42,7 +48,7 @@ class Player {
     this.frame = 0; // current animation frame
   }
 
-  update(offX, offY) {
+  update() {
     let inputX = 0;
     let inputY = 0;
     if (keyIsDown(65)) inputX = -1;
@@ -73,8 +79,8 @@ class Player {
 
     let checkX = nextX + this.vx * radius;
     let checkY = nextY + this.vy * radius;
-    let col = floor((checkX - offX) / tileSize);
-    let row = floor((checkY - offY) / tileSize);
+    let col = floor(checkX / tileSize);
+    let row = floor(checkY / tileSize);
 
     if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
       let tile = maze[row][col];
@@ -116,7 +122,7 @@ class Mover {
     this.vy = this.vx === 0 ? random([-1, 1]) : 0;
   }
 
-  update(offX, offY) {
+  update() {
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
 
@@ -125,8 +131,8 @@ class Mover {
     let checkX = nextX + this.vx * radius;
     let checkY = nextY + this.vy * radius;
 
-    let col = floor((checkX - offX) / tileSize);
-    let row = floor((checkY - offY) / tileSize);
+    let col = floor(checkX / tileSize);
+    let row = floor(checkY / tileSize);
 
     if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
       this.pickNewDirection();
@@ -234,14 +240,13 @@ function preload() {
 function setup() {
   createCanvas(800, 600);
 
-  const offX = (width - COLS * tileSize) / 2;
-  const offY = (height - ROWS * tileSize) / 2;
 
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
-        let pos = tileCenter(c, r, offX, offY);
-        player = new Player(pos.x, pos.y);
+        let x = c * tileSize + tileSize / 2;
+        let y = r * tileSize + tileSize / 2;
+        player = new Player(x, y);
         break outer;
       }
     }
@@ -249,14 +254,26 @@ function setup() {
 
   initWallExpansion();
 
-  let c1 = tileCenter(2, 3, offX, offY);
-  movers.push(new Mover(c1.x, c1.y));
+  let c1x = 2 * tileSize + tileSize / 2;
+  let c1y = 3 * tileSize + tileSize / 2;
+  movers.push(new Mover(c1x, c1y));
 
-  let c2 = tileCenter(6, 10, offX, offY);
-  movers.push(new Mover(c2.x, c2.y));
+  let c2x = 6 * tileSize + tileSize / 2;
+  let c2y = 10 * tileSize + tileSize / 2;
+  movers.push(new Mover(c2x, c2y));
 
-  let c3 = tileCenter(12, 8, offX, offY);
-  movers.push(new Mover(c3.x, c3.y));
+  let c3x = 12 * tileSize + tileSize / 2;
+  let c3y = 8 * tileSize + tileSize / 2;
+  movers.push(new Mover(c3x, c3y));
+}
+
+//camera function 
+function updateCamera() {
+  let targetX = player.x - width / 2;
+  let targetY = player.y - height / 2;
+
+  camX = lerp(camX, targetX, CAM_SMOOTHING);
+  camY = lerp(camY, targetY, CAM_SMOOTHING);
 }
 
 function draw() {
@@ -291,19 +308,32 @@ function draw() {
     return;
   }
 
-  const offX = (width - COLS * tileSize) / 2;
-  const offY = (height - ROWS * tileSize) / 2;
-  push();
+  updateCamera();
 
-  if (anxietyEffect) {
-    translate(
-      random(-1, 1),
-      random(-1, 1)
-    );
+push();
+
+// camera follow (THIS is the key line)
+translate(-camX, -camY);
+
+if (anxietyEffect) {
+  translate(random(-1, 1), random(-1, 1));
 }
-  updateWallExpansion(offX, offY);
-  drawMaze();
-  pop();
+
+updateWallExpansion(0, 0);
+drawMaze();
+
+// movers
+for (let m of movers) {
+  m.update(0, 0);
+  m.draw();
+}
+
+// player
+player.update(0, 0);
+player.draw();
+
+pop();
+
 
   if (socialBattery > 70) {
     player.speed = 2.5;
@@ -313,11 +343,10 @@ function draw() {
     player.speed = 1; 
   }
   
-  player.update(offX, offY);
-  player.draw();
+  
   // Check if player reached the end tile
-  let playerCol = floor((player.x - offX) / tileSize);
-  let playerRow = floor((player.y - offY) / tileSize);
+  let playerCol = floor(player.x / tileSize);
+  let playerRow = floor(player.y / tileSize);
 
   if (maze[playerRow][playerCol] === 3) {
     firstLevelComplete = true;
@@ -360,8 +389,7 @@ function drawStartScreen() {
 }
 
 function drawMaze() {
-  const offSetX = (width - COLS * tileSize) / 2;
-  const offSetY = (height - ROWS * tileSize) / 2;
+
 
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
@@ -373,8 +401,8 @@ function drawMaze() {
         fill(23, 53, 71); // wall
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
         rect(
-          col * tileSize + offSetX - expand,
-          row * tileSize + offSetY - expand,
+          col * tileSize - expand,
+          row * tileSize - expand,
           tileSize + expand * 2,
           tileSize + expand * 2,
         );
@@ -383,8 +411,8 @@ function drawMaze() {
         else if (tile === 2) fill(215, 240, 201);
         else if (tile === 3) fill(35, 107, 112);
         rect(
-          col * tileSize + offSetX,
-          row * tileSize + offSetY,
+          col * tileSize,
+          row * tileSize,
           tileSize,
           tileSize,
         );
@@ -398,13 +426,7 @@ function drawMaze() {
   textSize(12);
   text("LVL 1: Make your way to school!", 50, 20);
 
-  const offX = offSetX;
-  const offY = offSetY;
 
-  for (let m of movers) {
-    m.update(offX, offY);
-    m.draw();
-  }
 
   if (socialBattery <= 0) {
     socialBattery = 0;
@@ -414,7 +436,6 @@ function drawMaze() {
 
 function drawSocialBar() {
   textAlign(RIGHT, TOP);
-  noStroke();
   fill(255);
   textSize(12);
   text("Social Battery", 550, 20);
@@ -445,16 +466,15 @@ function restartGame() {
   socialBattery = 100;
   gameOver = false;
 
-  const offX = (width - COLS * tileSize) / 2;
-  const offY = (height - ROWS * tileSize) / 2;
 
   // Reset player to start tile
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
-        let pos = tileCenter(c, r, offX, offY);
-        player.x = pos.x;
-        player.y = pos.y;
+        
+        player.x = c * tileSize + tileSize / 2;
+        player.y = r * tileSize + tileSize / 2;
+
         break outer;
       }
     }
@@ -474,3 +494,4 @@ function drawFirstLevelCompleteScreen() {
   textSize(20);
   text("Press N to continue", width / 2, height / 2 + 20);
 }
+
