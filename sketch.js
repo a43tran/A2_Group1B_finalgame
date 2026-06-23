@@ -86,23 +86,23 @@ class Player {
   }
 
   draw() {
-    let row = SPRITE.rows[this.facing];
-    let frameW = SPRITE.frameWidth;
-    let frameH = SPRITE.frameHeight;
+  let row = SPRITE.rows[this.facing];
+  let frameW = SPRITE.frameWidth;
+  let frameH = SPRITE.frameHeight;
 
-    // Advance animation frame only when moving
-    if (this.vx !== 0 || this.vy !== 0) {
-      this.frame = (this.frame + 1) % (SPRITE.numFrames * SPRITE.animSpeed);
-    }
-    let col = floor(this.frame / SPRITE.animSpeed);
+  // Advance animation frame only when moving
+  if (this.vx !== 0 || this.vy !== 0) {
+    this.frame = (this.frame + 1) % (SPRITE.numFrames * SPRITE.animSpeed);
+  }
+  let col = floor(this.frame / SPRITE.animSpeed);
 
-    let srcX = col * frameW;
-    let srcY = row * frameH;
-    let drawW = frameW * SPRITE.scale;
-    let drawH = frameH * SPRITE.scale;
+  let srcX = col * frameW;
+  let srcY = row * frameH;
+  let drawW = frameW * SPRITE.scale;
+  let drawH = frameH * SPRITE.scale;
 
-    imageMode(CENTER);
-    image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
+  imageMode(CENTER);
+  image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
   }
 }
 
