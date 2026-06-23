@@ -293,9 +293,17 @@ function draw() {
 
   const offX = (width - COLS * tileSize) / 2;
   const offY = (height - ROWS * tileSize) / 2;
+  push();
 
+  if (anxietyEffect) {
+    translate(
+      random(-3, 3),
+      random(-3, 3)
+    );
+}
   updateWallExpansion(offX, offY);
   drawMaze();
+  pop();
 
   if (socialBattery > 70) {
     player.speed = 2.5;
