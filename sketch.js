@@ -249,18 +249,19 @@ function setup() {
 
   initWallExpansion();
 
-  let c1 = tileCenter(1, 1, offX, offY);
+  let c1 = tileCenter(2, 3, offX, offY);
   movers.push(new Mover(c1.x, c1.y));
 
-  let c2 = tileCenter(6, 2, offX, offY);
-  movers.push(new Mover(c1.x, c1.y));
-
-  let c3 = tileCenter(10, 3, offX, offY);
+  let c2 = tileCenter(6, 10, offX, offY);
   movers.push(new Mover(c2.x, c2.y));
+
+  let c3 = tileCenter(12, 8, offX, offY);
+  movers.push(new Mover(c3.x, c3.y));
 }
 
 function draw() {
   background(220);
+
 
   if (!gameStarted) {
     drawStartScreen();
@@ -271,6 +272,19 @@ function draw() {
     drawLoseScreen();
     return;
   }
+  anxietyEffect = false;
+  
+  for (let m of movers) {
+    let d = dist(player.x, player.y, m.x, m.y);
+
+    if (d < tileSize * 1.5) {
+      anxietyEffect = true;
+  }
+
+    if (d < tileSize * 0.6) {
+      socialBattery -= 0.5;
+  }
+}
 
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
