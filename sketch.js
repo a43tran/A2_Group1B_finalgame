@@ -277,7 +277,7 @@ function updateCamera() {
 }
 
 function draw() {
-  background(220);
+  background(3, 4, 33);
 
 
   if (!gameStarted) {
