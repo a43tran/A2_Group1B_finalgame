@@ -10,7 +10,6 @@ let thirdLevelComplete = false;
 let socialBattery = 100;
 let anxietyEffect = false;
 
-//camera variables
 let camX = 0;
 let camY = 0;
 const CAM_SMOOTHING = 0.1;
@@ -36,7 +35,6 @@ let maze = [
 ];
 
 let player;
-
 class Player {
   constructor(x, y) {
     this.x = x;
@@ -44,8 +42,8 @@ class Player {
     this.speed = 2.5;
     this.vx = 0;
     this.vy = 0;
-    this.facing = "down"; // default direction
-    this.frame = 0; // current animation frame
+    this.facing = "down";
+    this.frame = 0; 
   }
 
   update() {
@@ -67,7 +65,6 @@ class Player {
       this.vy = 0;
     }
 
-    // Track facing direction for sprite row
     if (this.vx === 1) this.facing = "right";
     if (this.vx === -1) this.facing = "left";
     if (this.vy === -1) this.facing = "up";
@@ -96,7 +93,6 @@ class Player {
     let frameW = SPRITE.frameWidth;
     let frameH = SPRITE.frameHeight;
 
-    // Advance animation frame only when moving
     if (this.vx !== 0 || this.vy !== 0) {
       this.frame = (this.frame + 1) % (SPRITE.numFrames * SPRITE.animSpeed);
     }
@@ -141,7 +137,6 @@ class Mover {
 
     let tile = maze[row][col];
     if (tile === 0 || tile === 2 || tile === 3) {
-      // Move normally
       this.x = nextX;
       this.y = nextY;
     } else {
@@ -187,8 +182,8 @@ function tileCenter(col, row, offX, offY) {
   };
 }
 
-const WALL_TRIGGER_DIST = 2.5; // tiles away to start expanding
-const WALL_MAX_EXPAND = 12; // max pixels to expand inward (tune this)
+const WALL_TRIGGER_DIST = 2.5;
+const WALL_MAX_EXPAND = 12; 
 const WALL_EXPAND_SPEED = 0.04;
 const WALL_SHRINK_SPEED = 0.02;
 
@@ -203,7 +198,6 @@ function updateWallExpansion(offX, offY) {
       let d = dist(playerCol, playerRow, c + 0.5, r + 0.5);
       let target = d < WALL_TRIGGER_DIST ? 1 : 0;
 
-      // Lerp toward target
       if (wallExpansion[r][c] < target) {
         wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, 1);
       } else {
@@ -267,7 +261,6 @@ function setup() {
   movers.push(new Mover(c3x, c3y));
 }
 
-//camera function 
 function updateCamera() {
   let targetX = player.x - width / 2;
   let targetY = player.y - height / 2;
@@ -278,13 +271,10 @@ function updateCamera() {
 
 function draw() {
   background(3, 4, 33);
-
-
   if (!gameStarted) {
     drawStartScreen();
     return;
   }
-
   if (gameOver) {
     drawLoseScreen();
     return;
@@ -293,23 +283,18 @@ function draw() {
   
   for (let m of movers) {
     let d = dist(player.x, player.y, m.x, m.y);
-
     if (d < tileSize * 1.5) {
       anxietyEffect = true;
   }
-
     if (d < tileSize * 0.6) {
       socialBattery -= 0.5;
   }
 }
-
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
     return;
   }
-
   updateCamera();
-
 push();
 
 let zoom = 1.5;
@@ -331,10 +316,10 @@ for (let m of movers) {
 }
 
 player.update();
+resolveWallPush();
 player.draw();
 
 pop();
-
 
   if (socialBattery > 70) {
     player.speed = 2.5;
@@ -344,7 +329,6 @@ pop();
     player.speed = 1; 
   }
   
-  
   // Check if player reached the end tile
   let playerCol = floor(player.x / tileSize);
   let playerRow = floor(player.y / tileSize);
@@ -353,7 +337,7 @@ pop();
     firstLevelComplete = true;
   }
   drawSocialBar();
-  // Check collision with enemies
+  // Check collision with movers
   for (let m of movers) {
     let d = dist(player.x, player.y, m.x, m.y);
     if (d < tileSize * 0.6) {
@@ -375,23 +359,37 @@ function keyPressed() {
   }
 }
 
-function drawStartScreen() {
-  fill(150, 153, 214);
-  rect(0, 0, width, height);
+function resolveWallPush() {
+  let radius = tileSize * 0.3;
 
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textFont("Monospace");
-  textSize(90);
-  text("A2 - GAME", width / 2, 300);
-  textSize(16);
-  text("Press SPACE to start", width / 2, 390);
-  text("Move by pressing WASD", width / 2, 420);
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] !== 1) continue;
+
+      let expand = wallExpansion[r][c] * WALL_MAX_EXPAND;
+
+      let wallLeft   = c * tileSize - expand;
+      let wallRight  = c * tileSize + tileSize + expand;
+      let wallTop    = r * tileSize - expand;
+      let wallBottom = r * tileSize + tileSize + expand;
+
+      let closestX = constrain(player.x, wallLeft, wallRight);
+      let closestY = constrain(player.y, wallTop, wallBottom);
+
+      let dx = player.x - closestX;
+      let dy = player.y - closestY;
+      let d  = sqrt(dx * dx + dy * dy);
+
+      if (d < radius && d > 0) {
+        let overlap = radius - d;
+        player.x += (dx / d) * overlap;
+        player.y += (dy / d) * overlap;
+      }
+    }
+  }
 }
 
 function drawMaze() {
-
-
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
       let tile = maze[row][col];
@@ -428,7 +426,6 @@ function drawMaze() {
 }
 
 function drawSocialBar() {
-
   fill(5, 8, 65);
   rect(0, 0, width, 60);
 
@@ -450,6 +447,20 @@ function drawSocialBar() {
   rect(560, 15, socialBattery * 1.9, 20);
 }
 
+function drawStartScreen() {
+  fill(150, 153, 214);
+  rect(0, 0, width, height);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textFont("Monospace");
+  textSize(90);
+  text("A2 - GAME", width / 2, 300);
+  textSize(16);
+  text("Press SPACE to start", width / 2, 390);
+  text("Move by pressing WASD", width / 2, 420);
+}
+
 function drawLoseScreen() {
   fill(0, 0, 0, 180);
   rect(0, 0, width, height);
@@ -468,7 +479,6 @@ function drawLoseScreen() {
 function restartGame() {
   socialBattery = 100;
   gameOver = false;
-
 
   // Reset player to start tile
   outer: for (let r = 0; r < ROWS; r++) {
