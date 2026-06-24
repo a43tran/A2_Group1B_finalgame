@@ -229,6 +229,9 @@ const SPRITE = {
 
 function preload() {
   character = loadImage("assets/images/character.png");
+  startScreen = loadImage("assets/images/homescreen.png");
+  restartScreen = loadImage("assets/images/restartscreen.png");
+  levelOneComplete = loadImage("assets/images/level1complete.png");
 }
 
 function setup() {
@@ -324,9 +327,9 @@ pop();
   if (socialBattery > 70) {
     player.speed = 2.5;
   } else if (socialBattery > 30) {
-    player.speed = 1.5; 
+    player.speed = 2; 
   } else {
-    player.speed = 1; 
+    player.speed = 1.5; 
   }
   
   // Check if player reached the end tile
@@ -448,39 +451,17 @@ function drawSocialBar() {
 }
 
 function drawStartScreen() {
-  fill(150, 153, 214);
-  rect(0, 0, width, height);
-
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textFont("Monospace");
-  textSize(90);
-  text("A2 - GAME", width / 2, 300);
-  textSize(16);
-  text("Press SPACE to start", width / 2, 390);
-  text("Move by pressing WASD", width / 2, 420);
+  image(startScreen, 0, 0, width, height);
 }
 
 function drawLoseScreen() {
-  fill(0, 0, 0, 180);
-  rect(0, 0, width, height);
-
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textFont("Monospace");
-  textSize(60);
-  text("You Burned Out", width / 2, height / 2 - 40);
-
-  textSize(20);
-  text("Your social battery hit 0", width / 2, height / 2 + 10);
-  text("Press R to restart", width / 2, height / 2 + 50);
+  image(restartScreen, 0, 0, width, height);
 }
 
 function restartGame() {
   socialBattery = 100;
   gameOver = false;
 
-  // Reset player to start tile
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
@@ -495,16 +476,6 @@ function restartGame() {
 }
 
 function drawFirstLevelCompleteScreen() {
-  fill(0, 0, 0, 180);
-  rect(0, 0, width, height);
-
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textFont("Monospace");
-  textSize(60);
-  text("Level 1 Complete!", width / 2, height / 2 - 40);
-
-  textSize(20);
-  text("Press N to continue", width / 2, height / 2 + 20);
+  image(levelOneComplete, 0, 0, width, height);
 }
 
