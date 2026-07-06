@@ -17,8 +17,7 @@ const CAM_SMOOTHING = 0.1;
 
 
 // initializing laser
-let laser;
-
+let laser; 
 let playerHitSound;
 
 // initializng frame to buffer damage rate
@@ -213,6 +212,9 @@ function preload() {
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
 
+  laserOn = loadImage("assets/images/laserOn.png");
+  laserOff = loadImage("assets/images/laserOff.png");
+
   //playerHitSound = loadSound("assets/sounds/xxxxxxxx.mp3")
   
 }
@@ -245,7 +247,11 @@ function updateCamera() {
 
 /*
 function checkLaserPlayerCollision() {
+
+  //Returns if player is still "invisible"
   if (playerInvincible) return;
+
+  //If laser is NOT on/true, return
   if (!laser) return;
 
 
@@ -256,7 +262,7 @@ function checkLaserPlayerCollision() {
     if (socialBattery < 0)
       socialBattery = 0;
 
-    // GAME OVER SCREEN
+    // INSERT GAME OVER SCREEN
 
     playerInvincible = true;
     invincibleTimer = INVINSIBLE_FRAMES;
