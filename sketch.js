@@ -8,17 +8,39 @@ let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
 let socialBattery = 100;
-let anxietyEffect = false;
 
 let camX = 0;
 let camY = 0;
 const CAM_SMOOTHING = 0.1;
 
 
+
+
+// initializing laser
+let laser;
+
+let playerHitSound;
+
+// initializng frame to buffer damage rate
+const INVINSIBLE_FRAMES = 60;
+
+// set current player "invincibility" to false
+let playerInvincible = false;
+
+// initialize invincible timer
+let invincibleTimer = 0;
+
+// initilize the laser damage
+const LASER_DAMAGE = 10;
+
+
+
 // 0 = path
 // 1 = wall
 // 2 = start
 // 3 = end
+
+// Maze map 
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 3, 1],
@@ -34,6 +56,7 @@ let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
+//Player model constructor
 let player;
 class Player {
   constructor(x, y) {
@@ -89,6 +112,10 @@ class Player {
   }
 
   draw() {
+
+    //This will flicker the character sprite when they get hit by laser
+    //  if (playerInvincible && floor(invincibleTimer / 6) % 2 === 0) return;
+
     let row = SPRITE.rows[this.facing];
     let frameW = SPRITE.frameWidth;
     let frameH = SPRITE.frameHeight;
@@ -107,62 +134,6 @@ class Player {
     image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
   }
 }
-
-class Mover {
-  constructor(x, y, speed = 1.5) {
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
-
-    this.vx = random([-1, 1, 0, 0]);
-    this.vy = this.vx === 0 ? random([-1, 1]) : 0;
-  }
-
-  update() {
-    let nextX = this.x + this.vx * this.speed;
-    let nextY = this.y + this.vy * this.speed;
-
-    let radius = tileSize * 0.25;
-
-    let checkX = nextX + this.vx * radius;
-    let checkY = nextY + this.vy * radius;
-
-    let col = floor(checkX / tileSize);
-    let row = floor(checkY / tileSize);
-
-    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) {
-      this.pickNewDirection();
-      return;
-    }
-
-    let tile = maze[row][col];
-    if (tile === 0 || tile === 2 || tile === 3) {
-      this.x = nextX;
-      this.y = nextY;
-    } else {
-      this.pickNewDirection();
-    }
-  }
-
-  pickNewDirection() {
-    let dirs = [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ];
-    let d = random(dirs);
-    this.vx = d[0];
-    this.vy = d[1];
-  }
-
-  draw() {
-    fill(1, 19, 33);
-    ellipse(this.x, this.y, tileSize * 0.8);
-  }
-}
-
-let movers = [];
 
 let wallExpansion = [];
 
@@ -227,11 +198,25 @@ const SPRITE = {
   },
 };
 
+let showTutorial = false;
+
+const tutorialButton = {
+  x: 290,
+  y: 420,
+  w: 220,
+  h: 50
+};
+
 function preload() {
   character = loadImage("assets/images/character.png");
   startScreen = loadImage("assets/images/homescreen.png");
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
+
+  //playerHitSound = loadSound("assets/sounds/xxxxxxxx.mp3")
+
+  brickWall = loadImage("assets/images/brick.png");
+  
 }
 
 function setup() {
@@ -250,18 +235,6 @@ function setup() {
   }
 
   initWallExpansion();
-
-  let c1x = 2 * tileSize + tileSize / 2;
-  let c1y = 3 * tileSize + tileSize / 2;
-  movers.push(new Mover(c1x, c1y));
-
-  let c2x = 6 * tileSize + tileSize / 2;
-  let c2y = 10 * tileSize + tileSize / 2;
-  movers.push(new Mover(c2x, c2y));
-
-  let c3x = 12 * tileSize + tileSize / 2;
-  let c3y = 8 * tileSize + tileSize / 2;
-  movers.push(new Mover(c3x, c3y));
 }
 
 function updateCamera() {
@@ -272,32 +245,62 @@ function updateCamera() {
   camY = lerp(camY, targetY, CAM_SMOOTHING);
 }
 
-function draw() {
-  background(3, 4, 33);
-  if (!gameStarted) {
-    drawStartScreen();
-    return;
+/*
+function checkLaserPlayerCollision() {
+  if (playerInvincible) return;
+  if (!laser) return;
+
+
+
+  if (hit) {
+    socialBattery -= LASER_DAMAGE;
+    
+    if (socialBattery < 0)
+      socialBattery = 0;
+
+    // GAME OVER SCREEN
+
+    playerInvincible = true;
+    invincibleTimer = INVINSIBLE_FRAMES;
+
+    //playerHitSound.play()
   }
-  if (gameOver) {
-    drawLoseScreen();
-    return;
-  }
-  anxietyEffect = false;
-  
-  for (let m of movers) {
-    let d = dist(player.x, player.y, m.x, m.y);
-    if (d < tileSize * 1.5) {
-      anxietyEffect = true;
-  }
-    if (d < tileSize * 0.6) {
-      socialBattery -= 0.5;
+
+function updateInvincibility() {
+  if (playerInvincible) {
+    invincibleTimer--;
+    if (invincibleTimer <= 0)
+      playerInvincible = false;
   }
 }
+
+
+}
+*/
+
+function draw() {
+  background(3, 4, 33);
+  if (!gameStarted && !showTutorial) {
+    drawStartScreen();
+    return;
+}
+
+  if (showTutorial) {
+    drawTutorialOverlay();
+    return;
+}
+
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
     return;
   }
   updateCamera();
+  
+  if (gameOver) {
+  drawLoseScreen();
+  return;
+  }
+
 push();
 
 let zoom = 1.5;
@@ -306,21 +309,21 @@ translate(width / 2, height / 2);
 scale(zoom);
 translate(-player.x, -player.y);
 
-if (anxietyEffect) {
-  translate(random(-1, 1), random(-1, 1));
-}
-
 updateWallExpansion(0, 0);
 drawMaze();
-
-for (let m of movers) {
-  m.update();
-  m.draw();
-}
 
 player.update();
 resolveWallPush();
 player.draw();
+
+/*
+//  This is in charge of checking whether the character is colliding with the laser, damaging their SB
+checkLaserPlayerCollision();
+
+// updateinvincibility checks if the character is invisible, if it is, then the character takesno damage 
+//    1 second, otherwise they take damage and the counter is reset to 60 FRAMES (aka 1 second)
+updateInvincibility();
+*/
 
 pop();
 
@@ -340,25 +343,50 @@ pop();
     firstLevelComplete = true;
   }
   drawSocialBar();
-  // Check collision with movers
-  for (let m of movers) {
-    let d = dist(player.x, player.y, m.x, m.y);
-    if (d < tileSize * 0.6) {
-      socialBattery -= 0.5; // drain battery
-    }
-  }
 }
 
 function keyPressed() {
   if (key === " " && !gameStarted) {
-    gameStarted = true;
+    showTutorial = true;
   }
 
   if (key === "r" || key === "R") {
     if (gameOver) restartGame();
   }
+
   if (key === "n" || key === "N") {
     if (firstLevelComplete) loadSecondLevel();
+  }
+}
+
+function mousePressed() {
+
+  // Help button on the HUD
+  if (
+    mouseX >= 755 &&
+    mouseX <= 785 &&
+    mouseY >= 15 &&
+    mouseY <= 45
+  ) {
+    showTutorial = true;
+    return;
+  }
+
+  // Continue button
+  if (showTutorial) {
+    if (
+      mouseX >= tutorialButton.x &&
+      mouseX <= tutorialButton.x + tutorialButton.w &&
+      mouseY >= tutorialButton.y &&
+      mouseY <= tutorialButton.y + tutorialButton.h
+    ) {
+      showTutorial = false;
+
+      // Only start the game the very first time
+      if (!gameStarted) {
+        gameStarted = true;
+      }
+    }
   }
 }
 
@@ -448,6 +476,60 @@ function drawSocialBar() {
 
   fill(100, 220, 120);
   rect(560, 15, socialBattery * 1.9, 20);
+
+  // Help button at the end of social battery bar
+  fill(40);
+  rect(755, 15, 30, 30, 5);
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(20);
+  text("?", 770, 30);
+}
+
+function drawTutorialOverlay() {
+  // Dark transparent background
+  fill(0, 180);
+  rect(0, 0, width, height);
+
+  // Main box
+  fill(245);
+  rect(120, 80, 560, 440, 15);
+
+  fill(30);
+  textAlign(CENTER);
+  textSize(28);
+  text("Tutorial", width / 2, 115);
+
+  textSize(16);
+  text(
+    "Use WASD to move.\n\n" +
+    "Reach the end of the maze.\n\n" +
+    "Your Social Battery decreases throughout the game.\n" +
+    "If it reaches 0, it's game over.\n\n" +
+    "Watch out for changing walls!",
+    width / 2,
+    175
+  );
+
+  // Close Button
+  fill(55, 85, 180);
+  rect(
+    tutorialButton.x,
+    tutorialButton.y,
+    tutorialButton.w,
+    tutorialButton.h,
+    10
+  );
+
+  fill(255);
+  textSize(18);
+  textAlign(CENTER, CENTER);
+  text(
+    "Continue",
+    tutorialButton.x + tutorialButton.w / 2,
+    tutorialButton.y + tutorialButton.h / 2
+  );
 }
 
 function drawStartScreen() {
@@ -478,4 +560,3 @@ function restartGame() {
 function drawFirstLevelCompleteScreen() {
   image(levelOneComplete, 0, 0, width, height);
 }
-
