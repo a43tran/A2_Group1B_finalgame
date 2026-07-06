@@ -214,13 +214,11 @@ function preload() {
   levelOneComplete = loadImage("assets/images/level1complete.png");
 
   //playerHitSound = loadSound("assets/sounds/xxxxxxxx.mp3")
-
-  brickWall = loadImage("assets/images/brick.png");
   
 }
 
 function setup() {
-  createCanvas(800, 600);
+  createCanvas(1280, 720);
 
 
   outer: for (let r = 0; r < ROWS; r++) {
@@ -363,8 +361,8 @@ function mousePressed() {
 
   // Help button on the HUD
   if (
-    mouseX >= 755 &&
-    mouseX <= 785 &&
+    mouseX >= 1210 &&
+    mouseX <= 1240 &&
     mouseY >= 15 &&
     mouseY <= 45
   ) {
@@ -472,19 +470,19 @@ function drawSocialBar() {
   text("Social Battery", 550, 20);
 
   fill(80);
-  rect(560, 15, 190, 20);
+  rect(1000, 15, 190, 20);
 
   fill(100, 220, 120);
-  rect(560, 15, socialBattery * 1.9, 20);
+  rect(1000, 15, socialBattery * 1.9, 20);
 
   // Help button at the end of social battery bar
   fill(40);
-  rect(755, 15, 30, 30, 5);
+  rect(1210, 15, 30, 30, 5);
 
   fill(255);
   textAlign(CENTER, CENTER);
   textSize(20);
-  text("?", 770, 30);
+  text("?", 1225, 30);
 }
 
 function drawTutorialOverlay() {
