@@ -161,8 +161,8 @@ class Player {
 
     image(
       character,
-      this.x + offset.x,
-      this.y + HITBOX_OFFSET_Y + offset.y,
+      (this.x + offset.x),
+      (this.y + HITBOX_OFFSET_Y + offset.y),
       drawW,
       drawH,
       srcX,
@@ -257,7 +257,7 @@ function preload() {
   levelOneComplete = loadImage("assets/images/level1complete.png");
 
   wall = loadImage("assets/images/brick.png");
-  floor = loadImage("assets/images/concrete.png");
+  ground = loadImage("assets/images/concrete.png");
   home = loadImage("assets/images/house.png");
   school = loadImage("assets/images/school.png");
 
@@ -571,7 +571,7 @@ function drawMaze() {
       } else {
         // floor blocks
         if (tile === 0) {
-          image(floor, col * tileSize, row * tileSize, tileSize, tileSize);
+          image(ground, col * tileSize, row * tileSize, tileSize, tileSize);
         }
         // starting from home block
         else if (tile === 2) {
