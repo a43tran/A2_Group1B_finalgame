@@ -259,8 +259,8 @@ function preload() {
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
 
-  wall = loadImage("assets/images/brick.png");
-  ground = loadImage("assets/images/concrete.png");
+  wall = loadImage("assets/images/trees.png");
+  ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
   school = loadImage("assets/images/school.png");
 
@@ -390,6 +390,8 @@ updateInvincibility();
 */
 
   pop();
+
+  drawVignette();
 
   if (socialBattery > 70) {
     player.speed = 2.5;
@@ -549,6 +551,23 @@ function checkCollectibles() {
       }
     }
   }
+}
+
+function drawVignette() {
+  let ctx = drawingContext;
+
+  let gradient = ctx.createRadialGradient(
+    width / 2, height / 2, height / 4,   // inner circle: center, small radius (fully clear)
+    width / 2, height / 2, height / 1.1  // outer circle: center, large radius (fully dark)
+  );
+
+  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");     // transparent center
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0.85)");  // dark edges
+
+  ctx.save();
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
 }
 
 function drawMaze() {
