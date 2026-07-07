@@ -66,7 +66,7 @@ let maze = [
 let player;
 let collectibles = [];
 let collectedCount = 0;
-const totalCollectibles = 5;
+const totalCollectibles = 1;
 
 
 class Player {
@@ -443,11 +443,20 @@ function resolveWallPush() {
 }
 function setupCollectibles() {
   collectibles = [
-    { col: 4, row: 10, collected: false },
-    { col: 8, row: 8, collected: false },
-    { col: 13, row: 11, collected: false },
-    { col: 18, row: 7, collected: false },
-    { col: 21, row: 12, collected: false }
+    // Top section
+    { col: 2, row: 1, collected: false },
+    { col: 9, row: 2, collected: false },
+    { col: 16, row: 2, collected: false },
+    { col: 22, row: 3, collected: false },
+
+    // Middle section
+    { col: 4, row: 6, collected: false },
+    { col: 10, row: 8, collected: false },
+    { col: 19, row: 7, collected: false },
+
+    // Bottom section
+    { col: 3, row: 11, collected: false },
+    { col: 13, row: 12, collected: false }
   ];
 }
 function drawCollectibles() {
