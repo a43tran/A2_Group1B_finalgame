@@ -28,8 +28,8 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
-const HITBOX_RADIUS = 10;
-const HITBOX_OFFSET_Y = 14;
+const HITBOX_RADIUS = 15;
+const HITBOX_OFFSET_Y = 8;
 
 // ORGANIZED FROM TOP OF THE SCREEN TO DOWN THE SCREEN
 let lasers = [
@@ -113,21 +113,11 @@ class Player {
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
 
-    // Feet position
-    let feetX = nextX;
-    let feetY = nextY + HITBOX_OFFSET_Y;
-
-    let checkX = feetX + this.vx * HITBOX_RADIUS;
-    let checkY = feetY + this.vy * HITBOX_RADIUS;
-    let col = floor(checkX / tileSize);
-    let row = floor(checkY / tileSize);
-
-    if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
-      let tile = maze[row][col];
-      if (tile === 0 || tile === 2 || tile === 3) {
-        this.x = nextX;
-        this.y = nextY;
-      }
+    if (this.vx !== 0 && canMoveTo(nextX, this.y)) {
+      this.x = nextX;
+    }
+    if (this.vy !== 0 && canMoveTo(this.x, nextY)) {
+      this.y = nextY;
     }
   }
 
@@ -150,7 +140,17 @@ class Player {
     let drawH = frameH * SPRITE.scale;
 
     imageMode(CENTER);
-    image(character, this.x, this.y, drawW, drawH, srcX, srcY, frameW, frameH);
+    image(
+      character,
+      this.x,
+      this.y + HITBOX_OFFSET_Y,
+      drawW,
+      drawH,
+      srcX,
+      srcY,
+      frameW,
+      frameH,
+    );
   }
 }
 
@@ -418,8 +418,32 @@ function mousePressed() {
   }
 }
 
+function canMoveTo(x, y) {
+  let feetY = y + HITBOX_OFFSET_Y;
+
+  // Check 4 points around the hitbox circle instead of a single point
+  let points = [
+    [x - HITBOX_RADIUS, feetY],
+    [x + HITBOX_RADIUS, feetY],
+    [x, feetY - HITBOX_RADIUS],
+    [x, feetY + HITBOX_RADIUS],
+  ];
+
+  for (let [px, py] of points) {
+    let col = floor(px / tileSize);
+    let row = floor(py / tileSize);
+
+    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
+
+    let tile = maze[row][col];
+    if (tile !== 0 && tile !== 2 && tile !== 3) return false;
+  }
+
+  return true;
+}
+
 function resolveWallPush() {
-  let radius = tileSize * 0.3;
+  let radius = HITBOX_RADIUS;
   let feetX = player.x;
   let feetY = player.y + HITBOX_OFFSET_Y;
 
@@ -538,7 +562,7 @@ function drawSocialBar() {
   textSize(12);
   text("LVL 1: Make your way to school!", 50, 12);
   textSize(12);
-  text("Collectibles: " + collectedCount + " / " + collectibles.length, 50, 34);
+  text("Fireflies: " + collectedCount + " / " + collectibles.length, 50, 34);
 
   textAlign(RIGHT, TOP);
   fill(255);
