@@ -636,56 +636,84 @@ function drawLasers() {
 }
 
 function drawTutorialOverlay() {
-  // Dark transparent background
-  fill(0, 0, 0, 180);
+  // Dark background
+  fill(0, 180);
   rect(0, 0, width, height);
 
-  // Tutorial box
-  const boxW = 560;
-  const boxH = 500;
-  const boxX = (width - boxW) / 2;
-  const boxY = (height - boxH) / 2;
+  // Main panel
+  const panelW = 650;
+  const panelH = 460;
+  const panelX = (width - panelW) / 2;
+  const panelY = (height - panelH) / 2;
 
   fill(245);
-  rect(boxX, boxY, boxW, boxH, 15);
+  rect(panelX, panelY, panelW, panelH, 15);
 
-  // Title
+  // ===== Title =====
   fill(30);
   textAlign(CENTER, TOP);
   textSize(28);
   textStyle(BOLD);
-  textFont("Monospace");
-  text("How to Play", width / 2, boxY + 30);
+  text("Tutorial", width / 2, panelY + 20);
 
-  // Instructions
+  // ===== WASD Instructions =====
   textStyle(NORMAL);
   textSize(18);
-  textLeading(30);
-
   text(
-    "OBJECTIVE\n" +
-      "Help Faith collect all the fireflies and guide her through the journey!\n\n" +
-      "CONTROLS\n" +
-      "• Use W, A, S, and D to move.\n\n" +
-      "COLLECTIBLES\n" +
-      "• Collect every firefly you find.\n" +
-      "• Fireflies are required to complete the level.\n" +
-      "• Keep an eye out—they may be hidden throughout the maze.\n\n" +
-      "SOCIAL BATTERY\n" +
-      "• Your Social Battery decreases as you progress.\n" +
-      "• If it reaches 0, it's game over.\n" +
-      "• Lower Social Battery also slows your movement.\n\n" +
-      "WARNING\n" +
-      "• Watch out for changing walls and other obstacles!",
-    boxX + 40,
-    boxY + 90,
-    boxW - 80,
-    boxH - 180,
+    "Use W A S D to move Faith through the maze.",
+    width / 2,
+    panelY + 70
   );
 
-  // Continue button
+  // ===== Three Boxes =====
+  const boxW = 160;
+  const boxH = 160;
+  const gap = 35;
+
+  const startX =
+    width / 2 - (boxW * 3 + gap * 2) / 2;
+  const boxY = panelY + 120;
+
+  fill(30);
+
+  for (let i = 0; i < 3; i++) {
+    rect(
+      startX + i * (boxW + gap),
+      boxY,
+      boxW,
+      boxH,
+      10
+    );
+  }
+
+  // ===== Instruction Text =====
+  fill(30);
+  textSize(16);
+  textAlign(CENTER, TOP);
+
+  text(
+    "Watch out for\nlasers on the walls.",
+    startX + boxW / 2,
+    boxY + boxH + 15
+  );
+
+  text(
+    "Collect fireflies\nalong the way.",
+    startX + boxW + gap + boxW / 2,
+    boxY + boxH + 15
+  );
+
+  text(
+    "Guide Faith\nto the end.",
+    startX + 2 * (boxW + gap) + boxW / 2,
+    boxY + boxH + 15
+  );
+
+  // ===== Continue Button =====
+  tutorialButton.w = 180;
+  tutorialButton.h = 45;
   tutorialButton.x = width / 2 - tutorialButton.w / 2;
-  tutorialButton.y = boxY + boxH - 60;
+  tutorialButton.y = panelY + panelH - 60;
 
   fill(55, 85, 180);
   rect(
@@ -693,18 +721,13 @@ function drawTutorialOverlay() {
     tutorialButton.y,
     tutorialButton.w,
     tutorialButton.h,
-    10,
+    10
   );
 
   fill(255);
   textAlign(CENTER, CENTER);
   textSize(18);
-  textStyle(BOLD);
-  text(
-    "Continue",
-    tutorialButton.x + tutorialButton.w / 2,
-    tutorialButton.y + tutorialButton.h / 2,
-  );
+  text("Continue", width / 2, tutorialButton.y + tutorialButton.h / 2);
 }
 
 function drawStartScreen() {
