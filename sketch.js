@@ -46,21 +46,24 @@ let lasers = [
 let laserBeams = [
   //top most laser
   {
-    x1: 85, y1: 96,   // beam start (pixel coordinates)
-    x2: 260, y2: 96,  // beam end (pixel coordinates)
+    x1: 85,
+    y1: 96, // beam start (pixel coordinates)
+    x2: 260,
+    y2: 96, // beam end (pixel coordinates)
     blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
-    timer: 0
+    timer: 0,
   },
   {
-    x1: 600, y1: 220,   
-    x2: 700, y2: 220,  
-    blinkRate: 80, 
+    x1: 600,
+    y1: 220,
+    x2: 700,
+    y2: 220,
+    blinkRate: 80,
     on: true,
-    timer: 0
+    timer: 0,
   },
 ];
-
 
 // 0 = path
 // 1 = wall
@@ -161,8 +164,8 @@ class Player {
 
     image(
       character,
-      (this.x + offset.x),
-      (this.y + HITBOX_OFFSET_Y + offset.y),
+      this.x + offset.x,
+      this.y + HITBOX_OFFSET_Y + offset.y,
       drawW,
       drawH,
       srcX,
@@ -331,7 +334,7 @@ function updateInvincibility() {
 */
 
 function draw() {
-  background(3, 4, 33);
+  background(87, 112, 53);
   if (!gameStarted && !showTutorial) {
     drawStartScreen();
     return;
@@ -355,7 +358,7 @@ function draw() {
 
   push();
 
-  let zoom = 1;
+  let zoom = 3.5;
 
   translate(width / 2, height / 2);
   scale(zoom);
@@ -366,8 +369,6 @@ function draw() {
 
   updateLasers();
   drawLasers();
-
- 
 
   player.update();
   resolveWallPush();
@@ -558,7 +559,6 @@ function drawMaze() {
       noStroke();
 
       if (tile === 1) {
-        fill(36, 39, 97); // wall
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
         // draw brick image in each wall block
         image(
@@ -566,7 +566,7 @@ function drawMaze() {
           col * tileSize - expand,
           row * tileSize - expand,
           tileSize + expand * 2,
-          tileSize + expand * 2
+          tileSize + expand * 2,
         );
       } else {
         // floor blocks
@@ -575,19 +575,12 @@ function drawMaze() {
         }
         // starting from home block
         else if (tile === 2) {
-        image(
-          home,
-          col * tileSize,
-          row * tileSize,
-          tileSize,
-          tileSize
-        );
-      }
+          image(home, col * tileSize, row * tileSize, tileSize, tileSize);
+        }
         // exit to school block
         else if (tile === 3) {
-        image(school, col * tileSize, row * tileSize, tileSize, tileSize);
-      }
-        rect(col * tileSize, row * tileSize, tileSize, tileSize);
+          image(school, col * tileSize, row * tileSize, tileSize, tileSize);
+        }
       }
     }
   }
@@ -681,7 +674,6 @@ function drawLasers() {
   }
 }
 
-
 function updateLaserBeams() {
   for (let l of laserBeams) {
     l.timer++;
@@ -702,7 +694,6 @@ function drawLaserBeams() {
     noStroke();
   }
 }
-  
 
 function drawTutorialOverlay() {
   // Dark background
@@ -729,31 +720,20 @@ function drawTutorialOverlay() {
   // ===== WASD Instructions =====
   textStyle(NORMAL);
   textSize(15);
-  text(
-    "Use WASD to move Faith through the maze.",
-    width / 2,
-    panelY + 80
-  );
+  text("Use WASD to move Faith through the maze.", width / 2, panelY + 80);
 
   // ===== Three Boxes =====
   const boxW = 170;
   const boxH = 170;
   const gap = 55;
 
-  const startX =
-    width / 2 - (boxW * 3 + gap * 2) / 2;
+  const startX = width / 2 - (boxW * 3 + gap * 2) / 2;
   const boxY = panelY + 135;
 
   fill(30);
 
   for (let i = 0; i < 3; i++) {
-    rect(
-      startX + i * (boxW + gap),
-      boxY,
-      boxW,
-      boxH,
-      10
-    );
+    rect(startX + i * (boxW + gap), boxY, boxW, boxH, 10);
   }
 
   // ===== Instruction Text =====
@@ -764,19 +744,19 @@ function drawTutorialOverlay() {
   text(
     "Watch out for\nlasers on the walls.",
     startX + boxW / 2,
-    boxY + boxH + 18
+    boxY + boxH + 18,
   );
 
   text(
     "Collect fireflies\nalong the way.",
     startX + boxW + gap + boxW / 2,
-    boxY + boxH + 18
+    boxY + boxH + 18,
   );
 
   text(
     "Guide Faith\nto the end.",
     startX + 2 * (boxW + gap) + boxW / 2,
-    boxY + boxH + 18
+    boxY + boxH + 18,
   );
 
   // ===== Continue Button =====
@@ -791,7 +771,7 @@ function drawTutorialOverlay() {
     tutorialButton.y,
     tutorialButton.w,
     tutorialButton.h,
-    10
+    10,
   );
 
   fill(255);
