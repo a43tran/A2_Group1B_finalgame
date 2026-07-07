@@ -13,7 +13,6 @@ let camX = 0;
 let camY = 0;
 const CAM_SMOOTHING = 0.1;
 
-// initializing laser
 let playerHitSound;
 
 // initializng frame to buffer damage rate
@@ -28,7 +27,7 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
-const HITBOX_RADIUS = 15;
+const HITBOX_RADIUS = 10;
 const HITBOX_OFFSET_Y = 8;
 
 // ORGANIZED FROM TOP OF THE SCREEN TO DOWN THE SCREEN
@@ -140,10 +139,13 @@ class Player {
     let drawH = frameH * SPRITE.scale;
 
     imageMode(CENTER);
+
+    let offset = SPRITE.offsets[this.facing];
+
     image(
       character,
-      this.x,
-      this.y + HITBOX_OFFSET_Y,
+      this.x + offset.x,
+      this.y + HITBOX_OFFSET_Y + offset.y,
       drawW,
       drawH,
       srcX,
@@ -217,8 +219,8 @@ const SPRITE = {
   offsets: {
     down: { x: 0, y: 0 },
     up: { x: 0, y: 0 },
-    right: { x: 0.1, y: 10 },
-    left: { x: 2.2, y: 10 },
+    right: { x: 0.1, y: -10 },
+    left: { x: 2.2, y: -10 },
   },
 };
 
@@ -585,6 +587,7 @@ function drawSocialBar() {
   text("?", 1225, 30);
 }
 
+// after 
 function updateLasers() {
   for (let l of lasers) {
     l.timer++;
@@ -609,6 +612,7 @@ function drawLasers() {
       offY = 0;
     let edgeOffset = tileSize / 2 - 4; // pushes sprite to the wall's edge
 
+    // "facing" parameter is set in the initilization of the lasers above 
     if (l.facing === "down") {
       angle = 0;
       offY = edgeOffset;
@@ -651,6 +655,7 @@ function drawTutorialOverlay() {
   textAlign(CENTER, TOP);
   textSize(28);
   textStyle(BOLD);
+  textFont("Monospace");
   text("How to Play", width / 2, boxY + 30);
 
   // Instructions
@@ -659,7 +664,7 @@ function drawTutorialOverlay() {
   textLeading(30);
 
   text(
-    "• Use WASD to move.\n\n" +
+      "• Use WASD to move.\n\n" +
       "• Reach the end of the maze.\n\n" +
       "• Your Social Battery drains as you\n" +
       "  encounter stressful situations.\n\n" +
