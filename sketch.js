@@ -1,6 +1,6 @@
-const tileSize = 50;
-const COLS = 16;
-const ROWS = 12;
+const tileSize = 40;
+const COLS = 25;
+const ROWS = 14;
 
 let gameStarted = false;
 let gameOver = false;
@@ -41,18 +41,20 @@ const LASER_DAMAGE = 10;
 
 // Maze map 
 let maze = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 3, 1],
-  [1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1],
-  [1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1],
-  [1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1],
-  [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
-  [1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1],
-  [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1],
-  [1, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 3, 1],
+  [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
+  [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1],
+  [1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
+  [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1],
+  [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+  [1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1],
+  [1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+  [1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+  [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+  [1, 2, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
 //Player model constructor
@@ -152,26 +154,25 @@ function tileCenter(col, row, offX, offY) {
   };
 }
 
-const WALL_TRIGGER_DIST = 2.5;
 const WALL_MAX_EXPAND = 12; 
 const WALL_EXPAND_SPEED = 0.04;
 const WALL_SHRINK_SPEED = 0.02;
 
-function updateWallExpansion(offX, offY) {
-  let playerCol = (player.x - offX) / tileSize;
-  let playerRow = (player.y - offY) / tileSize;
+function updateWallExpansion() {
+  // How "closed in" the walls should be, driven by social battery instead of player position.
+  // Full battery (100) -> target 0 (walls fully open)
+  // Empty battery (0)  -> target 1 (walls fully expanded/closed in)
+  let target = map(socialBattery, 100, 0, 0, 1);
+  target = constrain(target, 0, 1);
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] !== 1) continue; // only walls
 
-      let d = dist(playerCol, playerRow, c + 0.5, r + 0.5);
-      let target = d < WALL_TRIGGER_DIST ? 1 : 0;
-
       if (wallExpansion[r][c] < target) {
-        wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, 1);
-      } else {
-        wallExpansion[r][c] = max(wallExpansion[r][c] - WALL_SHRINK_SPEED, 0);
+        wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, target);
+      } else if (wallExpansion[r][c] > target) {
+        wallExpansion[r][c] = max(wallExpansion[r][c] - WALL_SHRINK_SPEED, target);
       }
     }
   }
@@ -313,7 +314,7 @@ translate(width / 2, height / 2);
 scale(zoom);
 translate(-player.x, -player.y);
 
-updateWallExpansion(0, 0);
+updateWallExpansion();
 drawMaze();
 
 player.update();
@@ -473,13 +474,13 @@ function drawSocialBar() {
   textAlign(RIGHT, TOP);
   fill(255);
   textSize(12);
-  text("Social Battery", 550, 20);
+  text("Social Battery", 990, 25);
 
   fill(80);
-  rect(1000, 15, 190, 20);
+  rect(1000, 20, 190, 20);
 
   fill(100, 220, 120);
-  rect(1000, 15, socialBattery * 1.9, 20);
+  rect(1000, 20, socialBattery * 1.9, 20);
 
   // Help button at the end of social battery bar
   fill(40);
