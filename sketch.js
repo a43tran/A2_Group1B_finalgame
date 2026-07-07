@@ -264,6 +264,7 @@ function preload() {
   ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
   school = loadImage("assets/images/school.png");
+  banner = loadImage("assets/images/HUD.png");
 
   laserOn = loadImage("assets/images/laserOn.png");
   laserOff = loadImage("assets/images/laserOff.png");
@@ -613,7 +614,7 @@ function drawMaze() {
 
 function drawSocialBar() {
   fill(5, 8, 65);
-  rect(0, 0, width, 60);
+  image(banner, 0, 0, width, 60);
 
   fill(255);
   textAlign(LEFT, TOP);
