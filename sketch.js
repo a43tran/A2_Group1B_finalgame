@@ -259,6 +259,7 @@ function preload() {
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
 
+  forest = loadImage("assets/images/forest.png");
   wall = loadImage("assets/images/trees.png");
   ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
@@ -334,7 +335,7 @@ function updateInvincibility() {
 */
 
 function draw() {
-  background(87, 112, 53);
+  background(forest);
   if (!gameStarted && !showTutorial) {
     drawStartScreen();
     return;
@@ -557,12 +558,12 @@ function drawVignette() {
   let ctx = drawingContext;
 
   let gradient = ctx.createRadialGradient(
-    width / 2, height / 2, height / 4,   // inner circle: center, small radius (fully clear)
-    width / 2, height / 2, height / 1.1  // outer circle: center, large radius (fully dark)
+    width / 2, height / 2, height / 4,  
+    width / 2, height / 2, height / 1.1  
   );
 
-  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");     // transparent center
-  gradient.addColorStop(1, "rgba(0, 0, 0, 0.85)");  // dark edges
+  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");  
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0.85)");  
 
   ctx.save();
   ctx.fillStyle = gradient;
