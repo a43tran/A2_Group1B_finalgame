@@ -641,8 +641,8 @@ function drawTutorialOverlay() {
   rect(0, 0, width, height);
 
   // Main panel
-  const panelW = 650;
-  const panelH = 460;
+  const panelW = 780;
+  const panelH = 520;
   const panelX = (width - panelW) / 2;
   const panelY = (height - panelH) / 2;
 
@@ -654,25 +654,26 @@ function drawTutorialOverlay() {
   textAlign(CENTER, TOP);
   textSize(28);
   textStyle(BOLD);
-  text("Tutorial", width / 2, panelY + 20);
+  textFont("Monospace");
+  text("How to Play", width / 2, panelY + 40);
 
   // ===== WASD Instructions =====
   textStyle(NORMAL);
-  textSize(18);
+  textSize(15);
   text(
-    "Use W A S D to move Faith through the maze.",
+    "Use WASD to move Faith through the maze.",
     width / 2,
-    panelY + 70
+    panelY + 80
   );
 
   // ===== Three Boxes =====
-  const boxW = 160;
-  const boxH = 160;
-  const gap = 35;
+  const boxW = 170;
+  const boxH = 170;
+  const gap = 55;
 
   const startX =
     width / 2 - (boxW * 3 + gap * 2) / 2;
-  const boxY = panelY + 120;
+  const boxY = panelY + 135;
 
   fill(30);
 
@@ -694,26 +695,26 @@ function drawTutorialOverlay() {
   text(
     "Watch out for\nlasers on the walls.",
     startX + boxW / 2,
-    boxY + boxH + 15
+    boxY + boxH + 18
   );
 
   text(
     "Collect fireflies\nalong the way.",
     startX + boxW + gap + boxW / 2,
-    boxY + boxH + 15
+    boxY + boxH + 18
   );
 
   text(
     "Guide Faith\nto the end.",
     startX + 2 * (boxW + gap) + boxW / 2,
-    boxY + boxH + 15
+    boxY + boxH + 18
   );
 
   // ===== Continue Button =====
   tutorialButton.w = 180;
   tutorialButton.h = 45;
   tutorialButton.x = width / 2 - tutorialButton.w / 2;
-  tutorialButton.y = panelY + panelH - 60;
+  tutorialButton.y = panelY + panelH - 70;
 
   fill(55, 85, 180);
   rect(
