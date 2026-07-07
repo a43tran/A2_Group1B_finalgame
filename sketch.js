@@ -44,6 +44,17 @@ let lasers = [
   { row: 7.3, col: 23.2, facing: "up", blinkRate: 60, on: true, timer: 0 },
 ];
 
+let lasersbeams = [
+  //top most laser
+  {
+    x1: 252, y1: 80,   // beam start (pixel coordinates)
+    x2: 252, y2: 200,  // beam end (pixel coordinates)
+    blinkRate: 80,
+    on: true,
+    timer: 0
+  }
+];
+
 // 0 = path
 // 1 = wall
 // 2 = start
@@ -237,6 +248,11 @@ function preload() {
   startScreen = loadImage("assets/images/homescreen.png");
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
+
+  wall = loadImage("assets/images/brick.png");
+  //floor = loadImage("assets/images/concrete.png");
+  //home = loadImage("assets/images/home.png");
+  //school = loadImage("assets/images/school.png");
 
   laserOn = loadImage("assets/images/laserOn.png");
   laserOff = loadImage("assets/images/laserOff.png");
@@ -580,9 +596,10 @@ function drawSocialBar() {
   fill(255, 220, 120);
   circle(1225, 30, 30);
 
-  fill(255);
+  fill(0);
   textAlign(CENTER, CENTER);
   textSize(15);
+  textStyle(BOLD);
   text("?", 1225, 30);
 }
 
@@ -714,7 +731,7 @@ function drawTutorialOverlay() {
   tutorialButton.w = 180;
   tutorialButton.h = 45;
   tutorialButton.x = width / 2 - tutorialButton.w / 2;
-  tutorialButton.y = panelY + panelH - 70;
+  tutorialButton.y = panelY + panelH - 100;
 
   fill(55, 85, 180);
   rect(
