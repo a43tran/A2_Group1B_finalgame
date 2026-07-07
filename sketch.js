@@ -30,10 +30,9 @@ const LASER_DAMAGE = 10;
 const HITBOX_RADIUS = 10;
 const HITBOX_OFFSET_Y = 8;
 
-// ORGANIZED FROM TOP OF THE SCREEN TO DOWN THE SCREEN
 let lasers = [
   //top most laser
-  { row: 2, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
+  { row: 2.3, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
   //right most laser
   { row: 5.3, col: 13.8, facing: "down", blinkRate: 100, on: true, timer: 0 },
 
@@ -44,16 +43,25 @@ let lasers = [
   { row: 7.3, col: 23.2, facing: "up", blinkRate: 60, on: true, timer: 0 },
 ];
 
-let lasersbeams = [
+let laserBeams = [
   //top most laser
   {
-    x1: 252, y1: 80,   // beam start (pixel coordinates)
-    x2: 252, y2: 200,  // beam end (pixel coordinates)
-    blinkRate: 80,
+    x1: 85, y1: 96,   // beam start (pixel coordinates)
+    x2: 260, y2: 96,  // beam end (pixel coordinates)
+    blinkRate: 80, // HAS TO MATCH WITH LASERS ABOVE
     on: true,
     timer: 0
-  }
+  },
+  {
+    x1: 600, y1: 220,   
+    x2: 700, y2: 220,  
+    blinkRate: 80, 
+    on: true,
+    timer: 0
+  },
+
 ];
+
 
 // 0 = path
 // 1 = wall
@@ -360,8 +368,13 @@ function draw() {
   updateLasers();
   drawLasers();
 
+ 
+
   player.update();
   resolveWallPush();
+
+  updateLaserBeams();
+  drawLaserBeams();
 
   drawCollectibles();
   checkCollectibles();
@@ -548,16 +561,33 @@ function drawMaze() {
       if (tile === 1) {
         fill(36, 39, 97); // wall
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
-        rect(
+        // draw brick image in each wall block
+        image(
+          wall,
           col * tileSize - expand,
           row * tileSize - expand,
           tileSize + expand * 2,
-          tileSize + expand * 2,
+          tileSize + expand * 2
         );
       } else {
-        if (tile === 0) fill(116, 119, 181);
-        else if (tile === 2) fill(247, 176, 204);
-        else if (tile === 3) fill(179, 80, 119);
+        // floor blocks
+        if (tile === 0) {
+          image(floor, col * tileSize, row * tileSize, tileSize, tileSize);
+        }
+        // starting from home block
+        else if (tile === 2) {
+        image(
+          home,
+          col * tileSize,
+          row * tileSize,
+          tileSize,
+          tileSize
+        );
+      }
+        // exit to school block
+        else if (tile === 3) {
+        image(school, col * tileSize, row * tileSize, tileSize, tileSize);
+      }
         rect(col * tileSize, row * tileSize, tileSize, tileSize);
       }
     }
@@ -651,6 +681,29 @@ function drawLasers() {
     pop();
   }
 }
+
+
+function updateLaserBeams() {
+  for (let l of laserBeams) {
+    l.timer++;
+    if (l.timer >= l.blinkRate) {
+      l.timer = 0;
+      l.on = !l.on;
+    }
+  }
+}
+
+function drawLaserBeams() {
+  for (let l of laserBeams) {
+    if (!l.on) continue; // don't draw when blinking off
+
+    stroke(255, 30, 30, 200);
+    strokeWeight(4);
+    line(l.x1, l.y1, l.x2, l.y2);
+    noStroke();
+  }
+}
+  
 
 function drawTutorialOverlay() {
   // Dark background
