@@ -28,27 +28,30 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
+const HITBOX_RADIUS = 10;
+const HITBOX_OFFSET_Y = 14;
+
+// ORGANIZED FROM TOP OF THE SCREEN TO DOWN THE SCREEN
 let lasers = [
   //top most laser
-  { row: 2, col: 6.5, facing: "up", blinkRate: 45, on: true, timer: 0 },
+  { row: 2, col: 6.3, facing: "up", blinkRate: 45, on: true, timer: 0 },
   //right most laser
   { row: 5.3, col: 13.8, facing: "down", blinkRate: 60, on: true, timer: 0 },
 
   //bottom most laser
-  { row: 9, col: 9, facing: "right", blinkRate: 30, on: true, timer: 0 }
+  //{ row: 8.8, col: 8.6, facing: "right", blinkRate: 30, on: true, timer: 0 }
+  { row: 9.3, col: 18.2, facing: "up", blinkRate: 30, on: true, timer: 0 },
+
+  //LASER BLOCKING THE EXIT
+  { row: 7.3, col: 23.2, facing: "up", blinkRate: 30, on: true, timer: 0 },
 ];
-  
-  
-
-
-
 
 // 0 = path
 // 1 = wall
 // 2 = start
 // 3 = end
 
-// Maze map 
+// Maze map
 let maze = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 3, 1],
@@ -72,7 +75,6 @@ let collectibles = [];
 let collectedCount = 0;
 //const totalCollectibles = ;
 
-
 class Player {
   constructor(x, y) {
     this.x = x;
@@ -81,7 +83,7 @@ class Player {
     this.vx = 0;
     this.vy = 0;
     this.facing = "down";
-    this.frame = 0; 
+    this.frame = 0;
   }
 
   update() {
@@ -108,12 +110,15 @@ class Player {
     if (this.vy === -1) this.facing = "up";
     if (this.vy === 1) this.facing = "down";
 
-    let radius = tileSize * 0.3;
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
 
-    let checkX = nextX + this.vx * radius;
-    let checkY = nextY + this.vy * radius;
+    // Feet position
+    let feetX = nextX;
+    let feetY = nextY + HITBOX_OFFSET_Y;
+
+    let checkX = feetX + this.vx * HITBOX_RADIUS;
+    let checkY = feetY + this.vy * HITBOX_RADIUS;
     let col = floor(checkX / tileSize);
     let row = floor(checkY / tileSize);
 
@@ -127,7 +132,6 @@ class Player {
   }
 
   draw() {
-
     //This will flicker the character sprite when they get hit by laser
     //  if (playerInvincible && floor(invincibleTimer / 6) % 2 === 0) return;
 
@@ -168,7 +172,7 @@ function tileCenter(col, row, offX, offY) {
   };
 }
 
-const WALL_MAX_EXPAND = 12; 
+const WALL_MAX_EXPAND = 12;
 const WALL_EXPAND_SPEED = 0.04;
 const WALL_SHRINK_SPEED = 0.02;
 
@@ -184,9 +188,15 @@ function updateWallExpansion() {
       if (maze[r][c] !== 1) continue; // only walls
 
       if (wallExpansion[r][c] < target) {
-        wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, target);
+        wallExpansion[r][c] = min(
+          wallExpansion[r][c] + WALL_EXPAND_SPEED,
+          target,
+        );
       } else if (wallExpansion[r][c] > target) {
-        wallExpansion[r][c] = max(wallExpansion[r][c] - WALL_SHRINK_SPEED, target);
+        wallExpansion[r][c] = max(
+          wallExpansion[r][c] - WALL_SHRINK_SPEED,
+          target,
+        );
       }
     }
   }
@@ -208,7 +218,7 @@ const SPRITE = {
     down: { x: 0, y: 0 },
     up: { x: 0, y: 0 },
     right: { x: 0.1, y: 10 },
-    left: { x: 2.2, y: 20 },
+    left: { x: 2.2, y: 10 },
   },
 };
 
@@ -218,7 +228,7 @@ const tutorialButton = {
   x: 290,
   y: 420,
   w: 220,
-  h: 50
+  h: 50,
 };
 
 function preload() {
@@ -231,12 +241,10 @@ function preload() {
   laserOff = loadImage("assets/images/laserOff.png");
 
   //playerHitSound = loadSound("assets/sounds/xxxxxxxx.mp3")
-  
 }
 
 function setup() {
   createCanvas(1280, 720);
-
 
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
@@ -249,8 +257,8 @@ function setup() {
     }
   }
 
- initWallExpansion();
- setupCollectibles(); 
+  initWallExpansion();
+  setupCollectibles();
 }
 
 function updateCamera() {
@@ -303,46 +311,46 @@ function draw() {
   if (!gameStarted && !showTutorial) {
     drawStartScreen();
     return;
-}
+  }
 
   if (showTutorial) {
     drawTutorialOverlay();
     return;
-}
+  }
 
   if (firstLevelComplete) {
     drawFirstLevelCompleteScreen();
     return;
   }
   updateCamera();
-  
+
   if (gameOver) {
-  drawLoseScreen();
-  return;
+    drawLoseScreen();
+    return;
   }
 
-push();
+  push();
 
-let zoom = 1;
+  let zoom = 1;
 
-translate(width / 2, height / 2);
-scale(zoom);
-translate(-player.x, -player.y);
+  translate(width / 2, height / 2);
+  scale(zoom);
+  translate(-player.x, -player.y);
 
-updateWallExpansion();
-drawMaze();
+  updateWallExpansion();
+  drawMaze();
 
-updateLasers();
-drawLasers();
+  updateLasers();
+  drawLasers();
 
-player.update();
-resolveWallPush();
+  player.update();
+  resolveWallPush();
 
-drawCollectibles();        
-checkCollectibles();   
-player.draw();
+  drawCollectibles();
+  checkCollectibles();
+  player.draw();
 
-/*
+  /*
 //  This is in charge of checking whether the character is colliding with the laser, damaging their SB
 checkLaserPlayerCollision();
 
@@ -351,16 +359,16 @@ checkLaserPlayerCollision();
 updateInvincibility();
 */
 
-pop();
+  pop();
 
   if (socialBattery > 70) {
     player.speed = 2.5;
   } else if (socialBattery > 30) {
-    player.speed = 2; 
+    player.speed = 2;
   } else {
-    player.speed = 1.5; 
+    player.speed = 1.5;
   }
-  
+
   // Check if player reached the end tile
   let playerCol = floor(player.x / tileSize);
   let playerRow = floor(player.y / tileSize);
@@ -386,14 +394,8 @@ function keyPressed() {
 }
 
 function mousePressed() {
-
   // Help button on the HUD
-  if (
-    mouseX >= 1210 &&
-    mouseX <= 1240 &&
-    mouseY >= 15 &&
-    mouseY <= 45
-  ) {
+  if (mouseX >= 1210 && mouseX <= 1240 && mouseY >= 15 && mouseY <= 45) {
     showTutorial = true;
     return;
   }
@@ -418,6 +420,8 @@ function mousePressed() {
 
 function resolveWallPush() {
   let radius = tileSize * 0.3;
+  let feetX = player.x;
+  let feetY = player.y + HITBOX_OFFSET_Y;
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
@@ -425,17 +429,17 @@ function resolveWallPush() {
 
       let expand = wallExpansion[r][c] * WALL_MAX_EXPAND;
 
-      let wallLeft   = c * tileSize - expand;
-      let wallRight  = c * tileSize + tileSize + expand;
-      let wallTop    = r * tileSize - expand;
+      let wallLeft = c * tileSize - expand;
+      let wallRight = c * tileSize + tileSize + expand;
+      let wallTop = r * tileSize - expand;
       let wallBottom = r * tileSize + tileSize + expand;
 
-      let closestX = constrain(player.x, wallLeft, wallRight);
-      let closestY = constrain(player.y, wallTop, wallBottom);
+      let closestX = constrain(feetX, wallLeft, wallRight);
+      let closestY = constrain(feetY, wallTop, wallBottom);
 
-      let dx = player.x - closestX;
-      let dy = player.y - closestY;
-      let d  = sqrt(dx * dx + dy * dy);
+      let dx = feetX - closestX;
+      let dy = feetY - closestY;
+      let d = sqrt(dx * dx + dy * dy);
 
       if (d < radius && d > 0) {
         let overlap = radius - d;
@@ -462,7 +466,7 @@ function setupCollectibles() {
     { col: 5, row: 10, collected: false },
     { col: 12, row: 11, collected: false },
     { col: 17, row: 11, collected: false },
-    { col: 22, row: 12, collected: false }
+    { col: 22, row: 12, collected: false },
   ];
 }
 function drawCollectibles() {
@@ -513,12 +517,7 @@ function drawMaze() {
         if (tile === 0) fill(116, 119, 181);
         else if (tile === 2) fill(247, 176, 204);
         else if (tile === 3) fill(179, 80, 119);
-        rect(
-          col * tileSize,
-          row * tileSize,
-          tileSize,
-          tileSize,
-        );
+        rect(col * tileSize, row * tileSize, tileSize, tileSize);
       }
     }
   }
@@ -537,7 +536,9 @@ function drawSocialBar() {
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textSize(12);
-  text("LVL 1: Make your way to school!", 50, 20);
+  text("LVL 1: Make your way to school!", 50, 12);
+  textSize(12);
+  text("Collectibles: " + collectedCount + " / " + collectibles.length, 50, 34);
 
   textAlign(RIGHT, TOP);
   fill(255);
@@ -551,12 +552,12 @@ function drawSocialBar() {
   rect(1000, 20, socialBattery * 1.9, 20);
 
   // Help button at the end of social battery bar
-  fill(40);
-  rect(1210, 15, 30, 30, 5);
+  fill(255, 220, 120);
+  circle(1225, 30, 30);
 
   fill(255);
   textAlign(CENTER, CENTER);
-  textSize(20);
+  textSize(15);
   text("?", 1225, 30);
 }
 
@@ -580,7 +581,8 @@ function drawLasers() {
     // Rotation + offset so the sprite sits flush on the wall face
     // pointing into the corridor, assuming the source image faces "down" by default.
     let angle = 0;
-    let offX = 0, offY = 0;
+    let offX = 0,
+      offY = 0;
     let edgeOffset = tileSize / 2 - 4; // pushes sprite to the wall's edge
 
     if (l.facing === "down") {
@@ -605,7 +607,6 @@ function drawLasers() {
     pop();
   }
 }
-
 
 function drawTutorialOverlay() {
   // Dark transparent background
@@ -635,17 +636,17 @@ function drawTutorialOverlay() {
 
   text(
     "• Use WASD to move.\n\n" +
-    "• Reach the end of the maze.\n\n" +
-    "• Your Social Battery drains as you\n" +
-    "  encounter stressful situations.\n\n" +
-    "• If your Social Battery reaches 0,\n" +
-    "  it's game over.\n\n" +
-    "• Be careful! The walls react if\n" +
-    "  your Social Battery drops!",
+      "• Reach the end of the maze.\n\n" +
+      "• Your Social Battery drains as you\n" +
+      "  encounter stressful situations.\n\n" +
+      "• If your Social Battery reaches 0,\n" +
+      "  it's game over.\n\n" +
+      "• Be careful! The walls react if\n" +
+      "  your Social Battery drops!",
     boxX + 40,
     boxY + 90,
     boxW - 80,
-    boxH - 180
+    boxH - 180,
   );
 
   // Continue button
@@ -658,7 +659,7 @@ function drawTutorialOverlay() {
     tutorialButton.y,
     tutorialButton.w,
     tutorialButton.h,
-    10
+    10,
   );
 
   fill(255);
@@ -668,7 +669,7 @@ function drawTutorialOverlay() {
   text(
     "Continue",
     tutorialButton.x + tutorialButton.w / 2,
-    tutorialButton.y + tutorialButton.h / 2
+    tutorialButton.y + tutorialButton.h / 2,
   );
 }
 
@@ -691,12 +692,10 @@ function restartGame() {
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
-        
         player.x = c * tileSize + tileSize / 2;
         player.y = r * tileSize + tileSize / 2;
 
         break outer;
-
       }
     }
   }
