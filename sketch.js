@@ -33,13 +33,12 @@ const HITBOX_OFFSET_Y = 8;
 // ORGANIZED FROM TOP OF THE SCREEN TO DOWN THE SCREEN
 let lasers = [
   //top most laser
-  { row: 2, col: 6.3, facing: "up", blinkRate: 45, on: true, timer: 0 },
+  { row: 2, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
   //right most laser
-  { row: 5.3, col: 13.8, facing: "down", blinkRate: 60, on: true, timer: 0 },
+  { row: 5.3, col: 13.8, facing: "down", blinkRate: 100, on: true, timer: 0 },
 
-  //bottom most laser
-  //{ row: 8.8, col: 8.6, facing: "right", blinkRate: 30, on: true, timer: 0 }
-  { row: 9.3, col: 18.2, facing: "up", blinkRate: 30, on: true, timer: 0 },
+  //laser covering longest hallway
+  { row: 9.3, col: 18.2, facing: "up", blinkRate: 180, on: true, timer: 0 },
 
   //LASER BLOCKING THE EXIT
   { row: 7.3, col: 23.2, facing: "up", blinkRate: 30, on: true, timer: 0 },
@@ -220,7 +219,7 @@ const SPRITE = {
     down: { x: 0, y: 0 },
     up: { x: 0, y: 0 },
     right: { x: 0.1, y: -10 },
-    left: { x: 2.2, y: -10 },
+    left: { x: 2.2, y: -1 },
   },
 };
 
@@ -663,19 +662,29 @@ function drawTutorialOverlay() {
   textSize(18);
   textLeading(30);
 
-  text(
-      "• Use WASD to move.\n\n" +
-      "• Reach the end of the maze.\n\n" +
-      "• Your Social Battery drains as you\n" +
-      "  encounter stressful situations.\n\n" +
-      "• If your Social Battery reaches 0,\n" +
-      "  it's game over.\n\n" +
-      "• Be careful! The walls react if\n" +
-      "  your Social Battery drops!",
+text(
+    "OBJECTIVE\n" +
+    "Help Faith collect all the fireflies and guide her through the journey!\n\n" +
+
+    "CONTROLS\n" +
+    "• Use W, A, S, and D to move.\n\n" +
+
+    "COLLECTIBLES\n" +
+    "• Collect every firefly you find.\n" +
+    "• Fireflies are required to complete the level.\n" +
+    "• Keep an eye out—they may be hidden throughout the maze.\n\n" +
+
+    "SOCIAL BATTERY\n" +
+    "• Your Social Battery decreases as you progress.\n" +
+    "• If it reaches 0, it's game over.\n" +
+    "• Lower Social Battery also slows your movement.\n\n" +
+
+    "WARNING\n" +
+    "• Watch out for changing walls and other obstacles!",
     boxX + 40,
     boxY + 90,
     boxW - 80,
-    boxH - 180,
+    boxH - 180
   );
 
   // Continue button
