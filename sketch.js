@@ -13,9 +13,6 @@ let camX = 0;
 let camY = 0;
 const CAM_SMOOTHING = 0.1;
 
-
-
-
 // initializing laser
 let laser; 
 let playerHitSound;
@@ -32,6 +29,19 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
+let lasers = [
+  { row: 1, col: 6, facing: "down", blinkRate: 45, on: true, timer: 0 },
+  { row: 5, col: 14, facing: "left", blinkRate: 60, on: true, timer: 0 },
+  { row: 9, col: 9, facing: "up", blinkRate: 30, on: true, timer: 0 }
+];
+  
+  
+
+// Variables for tracking collectibles
+let collectibles = [];
+
+let collectedCount = 0;
+const totalCollectibles = 5;
 
 
 // 0 = path
@@ -59,6 +69,11 @@ let maze = [
 
 //Player model constructor
 let player;
+let collectibles = [];
+let collectedCount = 0;
+const totalCollectibles = 5;
+
+
 class Player {
   constructor(x, y) {
     this.x = x;
@@ -235,7 +250,8 @@ function setup() {
     }
   }
 
-  initWallExpansion();
+ initWallExpansion();
+ setupCollectibles(); 
 }
 
 function updateCamera() {
@@ -308,7 +324,7 @@ function draw() {
 
 push();
 
-let zoom = 4;
+let zoom = 1;
 
 translate(width / 2, height / 2);
 scale(zoom);
@@ -317,8 +333,14 @@ translate(-player.x, -player.y);
 updateWallExpansion();
 drawMaze();
 
+updateLasers();
+drawLasers();
+
 player.update();
 resolveWallPush();
+
+drawCollectibles();        
+checkCollectibles();   
 player.draw();
 
 /*
@@ -424,6 +446,42 @@ function resolveWallPush() {
     }
   }
 }
+function setupCollectibles() {
+  collectibles = [
+    { col: 4, row: 10, collected: false },
+    { col: 8, row: 8, collected: false },
+    { col: 13, row: 11, collected: false },
+    { col: 18, row: 7, collected: false },
+    { col: 21, row: 12, collected: false }
+  ];
+}
+function drawCollectibles() {
+  for (let item of collectibles) {
+    if (!item.collected) {
+      let x = item.col * tileSize + tileSize / 2;
+      let y = item.row * tileSize + tileSize / 2;
+
+      fill(255, 220, 120);
+      ellipse(x, y, 12, 12);
+    }
+  }
+}
+
+function checkCollectibles() {
+  for (let item of collectibles) {
+    if (!item.collected) {
+      let x = item.col * tileSize + tileSize / 2;
+      let y = item.row * tileSize + tileSize / 2;
+
+      let d = dist(player.x, player.y, x, y);
+
+      if (d < 20) {
+        item.collected = true;
+        collectedCount++;
+      }
+    }
+  }
+}
 
 function drawMaze() {
   for (let row = 0; row < ROWS; row++) {
@@ -492,6 +550,53 @@ function drawSocialBar() {
   text("?", 1225, 30);
 }
 
+function updateLasers() {
+  for (let l of lasers) {
+    l.timer++;
+    if (l.timer >= l.blinkRate) {
+      l.timer = 0;
+      l.on = !l.on;
+    }
+  }
+}
+
+function drawLasers() {
+  imageMode(CENTER);
+
+  for (let l of lasers) {
+    let cx = l.col * tileSize + tileSize / 2;
+    let cy = l.row * tileSize + tileSize / 2;
+
+    // Rotation + offset so the sprite sits flush on the wall face
+    // pointing into the corridor, assuming the source image faces "down" by default.
+    let angle = 0;
+    let offX = 0, offY = 0;
+    let edgeOffset = tileSize / 2 - 4; // pushes sprite to the wall's edge
+
+    if (l.facing === "down") {
+      angle = 0;
+      offY = edgeOffset;
+    } else if (l.facing === "up") {
+      angle = PI;
+      offY = -edgeOffset;
+    } else if (l.facing === "right") {
+      angle = HALF_PI;
+      offX = edgeOffset;
+    } else if (l.facing === "left") {
+      angle = -HALF_PI;
+      offX = -edgeOffset;
+    }
+
+    push();
+    translate(cx + offX, cy + offY);
+    rotate(angle);
+    let img = l.on ? laserOn : laserOff;
+    image(img, 0, 0, tileSize * 0.8, tileSize * 0.5);
+    pop();
+  }
+}
+
+
 function drawTutorialOverlay() {
   // Dark transparent background
   fill(0, 180);
@@ -549,6 +654,10 @@ function restartGame() {
   socialBattery = 100;
   gameOver = false;
 
+  // Reset collectible progress
+  collectedCount = 0;
+  setupCollectibles();
+
   outer: for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] === 2) {
@@ -557,6 +666,7 @@ function restartGame() {
         player.y = r * tileSize + tileSize / 2;
 
         break outer;
+
       }
     }
   }
