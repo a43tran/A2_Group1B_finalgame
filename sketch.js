@@ -308,7 +308,7 @@ function draw() {
 
 push();
 
-let zoom = 1.5;
+let zoom = 4;
 
 translate(width / 2, height / 2);
 scale(zoom);
