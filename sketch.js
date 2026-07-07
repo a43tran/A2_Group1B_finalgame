@@ -14,11 +14,10 @@ let camY = 0;
 const CAM_SMOOTHING = 0.1;
 
 // initializing laser
-let laser; 
 let playerHitSound;
 
 // initializng frame to buffer damage rate
-const INVINSIBLE_FRAMES = 60;
+const INVINCIBLE_FRAMES = 60;
 
 // set current player "invincibility" to false
 let playerInvincible = false;
@@ -37,11 +36,7 @@ let lasers = [
   
   
 
-// Variables for tracking collectibles
-let collectibles = [];
 
-let collectedCount = 0;
-const totalCollectibles = 5;
 
 
 // 0 = path
@@ -282,7 +277,7 @@ function checkLaserPlayerCollision() {
     // INSERT GAME OVER SCREEN
 
     playerInvincible = true;
-    invincibleTimer = INVINSIBLE_FRAMES;
+    invincibleTimer = INVINCIBLE_FRAMES;
 
     //playerHitSound.play()
   }
