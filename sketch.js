@@ -288,6 +288,10 @@ function preload() {
   laserOff = loadImage("assets/images/laserOff.png");
 
   //playerHitSound = loadSound("assets/sounds/xxxxxxxx.mp3")
+  fail = loadSound("assets/sounds/fail.mp3");
+  win = loadSound("assets/sounds/win.mp3");
+  collect = loadSound("assets/sounds/collect.mp3");
+  walking = loadSound("assets/sounds/walking.mp3");
 }
 
 function setup() {
@@ -568,6 +572,7 @@ function checkCollectibles() {
       if (d < 20) {
         item.collected = true;
         collectedCount++;
+        collect.play();
       }
     }
   }
@@ -627,6 +632,7 @@ function drawMaze() {
   if (socialBattery <= 0) {
     socialBattery = 0;
     gameOver = true;
+    fail.play();
   }
 }
 
@@ -640,7 +646,7 @@ function drawSocialBar() {
   textSize(12);
   text("LVL 1: Make your way to school!", 50, 12);
   textSize(12);
-  text("Fireflies: " + collectedCount + " / " + collectibles.length, 50, 34);
+  text("Fireflies: " + collectedCount + " / " + collectibles.length, 50, height - 34);
 
   textAlign(RIGHT, TOP);
   fill(255);
