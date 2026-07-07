@@ -59,7 +59,6 @@ let laserBeams = [
     on: true,
     timer: 0
   },
-
 ];
 
 
@@ -258,9 +257,9 @@ function preload() {
   levelOneComplete = loadImage("assets/images/level1complete.png");
 
   wall = loadImage("assets/images/brick.png");
-  //floor = loadImage("assets/images/concrete.png");
-  //home = loadImage("assets/images/home.png");
-  //school = loadImage("assets/images/school.png");
+  floor = loadImage("assets/images/concrete.png");
+  home = loadImage("assets/images/house.png");
+  school = loadImage("assets/images/school.png");
 
   laserOn = loadImage("assets/images/laserOn.png");
   laserOff = loadImage("assets/images/laserOff.png");
