@@ -55,11 +55,29 @@ let laserBeams = [
     timer: 0,
   },
   {
-    x1: 600,
-    y1: 220,
-    x2: 700,
-    y2: 220,
-    blinkRate: 80,
+    x1: 580,
+    y1: 248,
+    x2: 680,
+    y2: 248,
+    blinkRate: 100,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 320,
+    y1: 380,
+    x2: 750,
+    y2: 380,
+    blinkRate: 150,
+    on: true,
+    timer: 0,
+  },
+  {
+    x1: 844,
+    y1: 300,
+    x2: 940,
+    y2: 300,
+    blinkRate: 60,
     on: true,
     timer: 0,
   },
@@ -298,16 +316,16 @@ function updateCamera() {
   camY = lerp(camY, targetY, CAM_SMOOTHING);
 }
 
-/*
+
 function checkLaserPlayerCollision() {
 
   //Returns if player is still "invisible"
   if (playerInvincible) return;
 
   //If laser is NOT on/true, return
-  if (!laser) return;
+  if (!laserBeams.on) return;
 
-
+  
 
   if (hit) {
     socialBattery -= LASER_DAMAGE;
@@ -333,7 +351,7 @@ function updateInvincibility() {
 
 
 }
-*/
+
 
 function draw() {
   background(forest);
