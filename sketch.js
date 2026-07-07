@@ -29,9 +29,13 @@ let invincibleTimer = 0;
 const LASER_DAMAGE = 10;
 
 let lasers = [
-  { row: 1, col: 6, facing: "down", blinkRate: 45, on: true, timer: 0 },
-  { row: 5, col: 14, facing: "left", blinkRate: 60, on: true, timer: 0 },
-  { row: 9, col: 9, facing: "up", blinkRate: 30, on: true, timer: 0 }
+  //top most laser
+  { row: 2, col: 6.5, facing: "up", blinkRate: 45, on: true, timer: 0 },
+  //right most laser
+  { row: 5.3, col: 13.8, facing: "down", blinkRate: 60, on: true, timer: 0 },
+
+  //bottom most laser
+  { row: 9, col: 9, facing: "right", blinkRate: 30, on: true, timer: 0 }
 ];
   
   
@@ -66,7 +70,7 @@ let maze = [
 let player;
 let collectibles = [];
 let collectedCount = 0;
-const totalCollectibles = 1;
+//const totalCollectibles = ;
 
 
 class Player {
@@ -445,18 +449,20 @@ function setupCollectibles() {
   collectibles = [
     // Top section
     { col: 2, row: 1, collected: false },
-    { col: 9, row: 2, collected: false },
-    { col: 16, row: 2, collected: false },
-    { col: 22, row: 3, collected: false },
+    { col: 10, row: 2, collected: false },
+    { col: 16, row: 3, collected: false },
+    { col: 20, row: 5, collected: false },
 
     // Middle section
-    { col: 4, row: 6, collected: false },
-    { col: 10, row: 8, collected: false },
-    { col: 19, row: 7, collected: false },
+    { col: 3, row: 8, collected: false },
+    { col: 8, row: 9, collected: false },
+    { col: 16, row: 9, collected: false },
 
     // Bottom section
-    { col: 3, row: 11, collected: false },
-    { col: 13, row: 12, collected: false }
+    { col: 5, row: 10, collected: false },
+    { col: 12, row: 11, collected: false },
+    { col: 17, row: 11, collected: false },
+    { col: 22, row: 12, collected: false }
   ];
 }
 function drawCollectibles() {
@@ -603,30 +609,49 @@ function drawLasers() {
 
 function drawTutorialOverlay() {
   // Dark transparent background
-  fill(0, 180);
+  fill(0, 0, 0, 180);
   rect(0, 0, width, height);
 
-  // Main box
+  // Tutorial box
+  const boxW = 560;
+  const boxH = 420;
+  const boxX = (width - boxW) / 2;
+  const boxY = (height - boxH) / 2;
+
   fill(245);
-  rect(120, 80, 560, 440, 15);
+  rect(boxX, boxY, boxW, boxH, 15);
 
+  // Title
   fill(30);
-  textAlign(CENTER);
+  textAlign(CENTER, TOP);
   textSize(28);
-  text("Tutorial", width / 2, 115);
+  textStyle(BOLD);
+  text("How to Play", width / 2, boxY + 30);
 
-  textSize(16);
+  // Instructions
+  textStyle(NORMAL);
+  textSize(18);
+  textLeading(30);
+
   text(
-    "Use WASD to move.\n\n" +
-    "Reach the end of the maze.\n\n" +
-    "Your Social Battery decreases throughout the game.\n" +
-    "If it reaches 0, it's game over.\n\n" +
-    "Watch out for changing walls!",
-    width / 2,
-    175
+    "• Use WASD to move.\n\n" +
+    "• Reach the end of the maze.\n\n" +
+    "• Your Social Battery drains as you\n" +
+    "  encounter stressful situations.\n\n" +
+    "• If your Social Battery reaches 0,\n" +
+    "  it's game over.\n\n" +
+    "• Be careful! The walls react if\n" +
+    "  your Social Battery drops!",
+    boxX + 40,
+    boxY + 90,
+    boxW - 80,
+    boxH - 180
   );
 
-  // Close Button
+  // Continue button
+  tutorialButton.x = width / 2 - tutorialButton.w / 2;
+  tutorialButton.y = boxY + boxH - 70;
+
   fill(55, 85, 180);
   rect(
     tutorialButton.x,
@@ -637,8 +662,9 @@ function drawTutorialOverlay() {
   );
 
   fill(255);
-  textSize(18);
   textAlign(CENTER, CENTER);
+  textSize(18);
+  textStyle(BOLD);
   text(
     "Continue",
     tutorialButton.x + tutorialButton.w / 2,
