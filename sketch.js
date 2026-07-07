@@ -563,7 +563,7 @@ function drawVignette() {
   );
 
   gradient.addColorStop(0, "rgba(0, 0, 0, 0)");  
-  gradient.addColorStop(1, "rgba(0, 0, 0, 0.85)");  
+  gradient.addColorStop(1, "rgba(0, 0, 0, 2)");  
 
   ctx.save();
   ctx.fillStyle = gradient;
