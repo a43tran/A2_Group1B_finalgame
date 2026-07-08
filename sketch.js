@@ -8,6 +8,7 @@ let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
 let socialBattery = 100;
+let fireflySprite;
 
 let camX = 0;
 let camY = 0;
@@ -150,6 +151,16 @@ class Player {
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
 
+    const isMoving = (this.vx !== 0 || this.vy !== 0);
+
+    if (isMoving && !walking.isPlaying()) {
+      walking.play();
+    }
+
+    if (!isMoving && walking.isPlaying()) {
+      walking.stop();
+    }
+
     if (this.vx !== 0 && canMoveTo(nextX, this.y)) {
       this.x = nextX;
     }
@@ -262,6 +273,14 @@ const SPRITE = {
   },
 };
 
+const FIREFLY = {
+  frameWidth: 347,
+  frameHeight: 512,
+  numFrames: 8,
+  animSpeed: 6,
+  scale: 0.08,
+};
+
 let showTutorial = false;
 
 const tutorialButton = {
@@ -276,6 +295,7 @@ function preload() {
   startScreen = loadImage("assets/images/homescreen.png");
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
+  fireflySprite = loadImage("assets/images/firefly.png");
 
   forest = loadImage("assets/images/forest.png");
   wall = loadImage("assets/images/trees.png");
@@ -323,11 +343,19 @@ function updateCamera() {
 
 function checkLaserPlayerCollision() {
 
-  //Returns if player is still "invisible"
   if (playerInvincible) return;
 
-  //If laser is NOT on/true, return
-  if (!laserBeams.on) return;
+  let feetY = player.y + HITBOX_OFFSET_Y;
+
+  for (let l of laserBeams) {
+    if (!l.on) continue;
+
+    let minX = min(l.x1, l.x2) - HITBOX_RADIUS;
+    let maxX = max(l.x1, l.x2) + HITBOX_RADIUS;
+    let minY = min(l.y1, l.y2) - HITBOX_RADIUS;
+    let maxY = max(l.y1, l.y2) + HITBOX_RADIUS;
+
+    let hit = player.x > minX && player.x < maxX && feetY > minY && feetY < maxY;
 
   
 
@@ -344,6 +372,7 @@ function checkLaserPlayerCollision() {
 
     //playerHitSound.play()
   }
+}
 
 function updateInvincibility() {
   if (playerInvincible) {
@@ -400,18 +429,19 @@ function draw() {
   updateLaserBeams();
   drawLaserBeams();
 
+  updateFireflies();
   drawCollectibles();
   checkCollectibles();
   player.draw();
 
-  /*
+  
 //  This is in charge of checking whether the character is colliding with the laser, damaging their SB
 checkLaserPlayerCollision();
 
 // updateinvincibility checks if the character is invisible, if it is, then the character takesno damage 
 //    1 second, otherwise they take damage and the counter is reset to 60 FRAMES (aka 1 second)
 updateInvincibility();
-*/
+
 
   pop();
 
@@ -532,32 +562,68 @@ function resolveWallPush() {
 function setupCollectibles() {
   collectibles = [
     // Top section
-    { col: 2, row: 1, collected: false },
-    { col: 10, row: 2, collected: false },
-    { col: 16, row: 3, collected: false },
-    { col: 20, row: 5, collected: false },
+    { col: 2, row: 1, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0},
+    { col: 10, row: 2, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 16, row: 3, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 20, row: 5, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
 
     // Middle section
-    { col: 3, row: 8, collected: false },
-    { col: 8, row: 9, collected: false },
-    { col: 16, row: 9, collected: false },
+    { col: 3, row: 8, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 8, row: 9, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 16, row: 9, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
 
     // Bottom section
-    { col: 5, row: 10, collected: false },
-    { col: 12, row: 11, collected: false },
-    { col: 17, row: 11, collected: false },
-    { col: 22, row: 12, collected: false },
+    { col: 5, row: 10, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 12, row: 11, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 17, row: 11, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    { col: 22, row: 12, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
   ];
 }
-function drawCollectibles() {
+function updateFireflies() {
   for (let item of collectibles) {
-    if (!item.collected) {
-      let x = item.col * tileSize + tileSize / 2;
-      let y = item.row * tileSize + tileSize / 2;
 
-      fill(255, 220, 120);
-      ellipse(x, y, 12, 12);
+    if (item.collected) continue;
+
+    item.frameTimer++;
+
+    if (item.frameTimer >= FIREFLY.animSpeed) {
+
+      item.frameTimer = 0;
+
+      item.frame =
+        (item.frame + 1) %
+        FIREFLY.numFrames;
     }
+  }
+}
+function drawCollectibles() {
+
+  imageMode(CENTER);
+
+  for (let item of collectibles) {
+
+    if (item.collected) continue;
+
+    let x = item.col * tileSize + tileSize / 2;
+    let y = item.row * tileSize + tileSize / 2;
+
+    let sx = item.frame * FIREFLY.frameWidth;
+    let sy = 0;
+
+    let dw = FIREFLY.frameWidth * FIREFLY.scale;
+    let dh = FIREFLY.frameHeight * FIREFLY.scale;
+
+    image(
+      fireflySprite,
+      x,
+      y,
+      dw,
+      dh,
+      sx,
+      sy,
+      FIREFLY.frameWidth,
+      FIREFLY.frameHeight
+    );
   }
 }
 
@@ -643,15 +709,15 @@ function drawSocialBar() {
   fill(255);
   textAlign(LEFT, TOP);
   textFont("Monospace");
-  textSize(12);
-  text("LVL 1: Make your way to school!", 50, 12);
-  textSize(12);
+  textSize(15);
+  text("LVL 1: Make your way to school!", 50, 24);
+  textSize(15);
   text("Fireflies: " + collectedCount + " / " + collectibles.length, 50, height - 34);
 
   textAlign(RIGHT, TOP);
   fill(255);
-  textSize(12);
-  text("Social Battery", 990, 25);
+  textSize(15);
+  text("Social Battery", 980, 25);
 
   fill(80);
   rect(1000, 20, 190, 20);
