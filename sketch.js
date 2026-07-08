@@ -444,15 +444,16 @@ function draw() {
 
   pop();
 
-  updateBadge();
-  drawBadge();
-
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
   }
 
   drawVignette();
+
+  updateBadge();
+  drawBadge();
+
 
   if (socialBattery > 70) {
     player.speed = 2.5;
