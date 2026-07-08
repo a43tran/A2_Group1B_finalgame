@@ -76,7 +76,7 @@ const FIREFLY = {
 };
 
 // WALL EXPANSION/SHRINK
-const WALL_MAX_EXPAND = 23;
+const WALL_MAX_EXPAND = 20;
 const WALL_EXPAND_SPEED = 0.06;
 const WALL_SHRINK_SPEED = 0.02;
 const PROXIMITY_RADIUS = 7;
@@ -114,7 +114,7 @@ const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
 // PLAYER HITBOX
-const HITBOX_RADIUS = 12;
+const HITBOX_RADIUS = 10;
 const HITBOX_OFFSET_Y = 9;
 
 let lasers = [
