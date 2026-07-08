@@ -76,8 +76,8 @@ const FIREFLY = {
 };
 
 // WALL EXPANSION/SHRINK
-const WALL_MAX_EXPAND = 20;
-const WALL_EXPAND_SPEED = 0.06;
+const WALL_MAX_EXPAND = 10;
+const WALL_EXPAND_SPEED = 0.04;
 const WALL_SHRINK_SPEED = 0.02;
 const PROXIMITY_RADIUS = 7;
 let wallExpansion = [];
@@ -114,7 +114,7 @@ const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
 // PLAYER HITBOX
-const HITBOX_RADIUS = 10;
+const HITBOX_RADIUS = 12;
 const HITBOX_OFFSET_Y = 9;
 
 let lasers = [
@@ -425,7 +425,9 @@ function draw() {
   drawLasers();
 
   player.update();
+  if (socialBattery > 0) {
   resolveWallPush();
+}
 
   updateLaserBeams();
   drawLaserBeams();
@@ -579,6 +581,7 @@ function canMoveTo(x, y) {
 
 // WALL EXPANSION
 function resolveWallPush() {
+  if (socialBattery <= 0) return;
   let radius = HITBOX_RADIUS;
   let feetX = player.x;
   let feetY = player.y + HITBOX_OFFSET_Y;
