@@ -75,6 +75,14 @@ const FIREFLY = {
   scale: 0.09,
 };
 
+// WALL EXPANSION/SHRINK
+const WALL_MAX_EXPAND = 23;
+const WALL_EXPAND_SPEED = 0.06;
+const WALL_SHRINK_SPEED = 0.02;
+const PROXIMITY_RADIUS = 7;
+let wallExpansion = [];
+let wallVariation = [];
+
 // WALL MECHANIC (LOSE STATE)
 let trappedTimer = 0;
 const TRAPPED_DELAY = 30;
@@ -297,69 +305,11 @@ const tutorialButton = {
   h: 50,
 };
 
-// WALL EXPANSION MECHANIC
-let wallExpansion = [];
-let wallVariation = [];
-
-function initWallExpansion() {
-  for (let r = 0; r < ROWS; r++) {
-    wallExpansion[r] = [];
-    wallVariation[r] = [];
-    for (let c = 0; c < COLS; c++) {
-      wallExpansion[r][c] = 0;
-      wallVariation[r][c] = random(0.6, 1.3);
-    }
-  }
-}
-
 function tileCenter(col, row, offX, offY) {
   return {
     x: offX + col * tileSize + tileSize / 2,
     y: offY + row * tileSize + tileSize / 2,
   };
-}
-
-const WALL_MAX_EXPAND = 23;
-const WALL_EXPAND_SPEED = 0.06;
-const WALL_SHRINK_SPEED = 0.02;
-const PROXIMITY_RADIUS = 7;
-
-function updateWallExpansion() {
-  let batteryTarget = map(socialBattery, 100, 0, 0, 1);
-  batteryTarget = constrain(batteryTarget, 0, 1);
-  batteryTarget = pow(batteryTarget, 3);
-
-  let playerCol = player.x / tileSize;
-  let playerRow = player.y / tileSize;
-
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      if (maze[r][c] !== 1) continue;
-
-      let d = dist(c, r, playerCol, playerRow);
-      let proximity = constrain(map(d, 0, PROXIMITY_RADIUS, 1, 0), 0, 1);
-
-      let target;
-      if (socialBattery <= 0) {
-        target = 1; // still fully locks at zero, variation doesn't apply here
-      } else {
-        target = batteryTarget * proximity * wallVariation[r][c];
-        target = constrain(target, 0, 1); // in case variation pushes it over 1
-      }
-
-      if (wallExpansion[r][c] < target) {
-        wallExpansion[r][c] = min(
-          wallExpansion[r][c] + WALL_EXPAND_SPEED,
-          target,
-        );
-      } else if (wallExpansion[r][c] > target) {
-        wallExpansion[r][c] = max(
-          wallExpansion[r][c] - WALL_SHRINK_SPEED,
-          target,
-        );
-      }
-    }
-  }
 }
 
 function preload() {
@@ -413,53 +363,6 @@ function updateCamera() {
 
   camX = lerp(camX, targetX, CAM_SMOOTHING);
   camY = lerp(camY, targetY, CAM_SMOOTHING);
-}
-
-function checkLaserPlayerCollision() {
-  if (playerInvincible) return;
-
-  let feetY = player.y + HITBOX_OFFSET_Y;
-
-  for (let l of laserBeams) {
-    if (!l.on) continue;
-
-    let minX = min(l.x1, l.x2) - HITBOX_RADIUS;
-    let maxX = max(l.x1, l.x2) + HITBOX_RADIUS;
-    let minY = min(l.y1, l.y2) - HITBOX_RADIUS;
-    let maxY = max(l.y1, l.y2) + HITBOX_RADIUS;
-
-    let hit =
-      player.x > minX && player.x < maxX && feetY > minY && feetY < maxY;
-
-    if (hit) {
-      socialBattery -= LASER_DAMAGE;
-
-      if (socialBattery < 0) socialBattery = 0;
-
-      // INSERT GAME OVER SCREEN
-
-      playerInvincible = true;
-      invincibleTimer = INVINCIBLE_FRAMES;
-
-      playerHitSound.play();
-
-      hitFlashAlpha = HIT_FLASH_MAX;
-    }
-  }
-}
-
-function drawRedFlash(alpha) {
-  let borderSize = 30;
-  noStroke();
-  fill(255, 0, 0, alpha);
-  rect(0, 0, width, height);
-}
-
-function updateInvincibility() {
-  if (playerInvincible) {
-    invincibleTimer--;
-    if (invincibleTimer <= 0) playerInvincible = false;
-  }
 }
 
 function draw() {
@@ -628,6 +531,7 @@ function mousePressed() {
   }
 }
 
+// COLLISION CHECK
 function canMoveTo(x, y) {
   let feetY = y + HITBOX_OFFSET_Y;
 
@@ -669,6 +573,7 @@ function canMoveTo(x, y) {
   return true;
 }
 
+// WALL EXPANSION
 function resolveWallPush() {
   let radius = HITBOX_RADIUS;
   let feetX = player.x;
@@ -700,6 +605,75 @@ function resolveWallPush() {
     }
   }
 }
+
+function initWallExpansion() {
+  for (let r = 0; r < ROWS; r++) {
+    wallExpansion[r] = [];
+    wallVariation[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      wallExpansion[r][c] = 0;
+      wallVariation[r][c] = random(0.6, 1.3);
+    }
+  }
+}
+
+function updateWallExpansion() {
+  let batteryTarget = map(socialBattery, 100, 0, 0, 1);
+  batteryTarget = constrain(batteryTarget, 0, 1);
+  batteryTarget = pow(batteryTarget, 3);
+
+  let playerCol = player.x / tileSize;
+  let playerRow = player.y / tileSize;
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (maze[r][c] !== 1) continue;
+
+      let d = dist(c, r, playerCol, playerRow);
+      let proximity = constrain(map(d, 0, PROXIMITY_RADIUS, 1, 0), 0, 1);
+
+      let target;
+      if (socialBattery <= 0) {
+        target = 1; // still fully locks at zero, variation doesn't apply here
+      } else {
+        target = batteryTarget * proximity * wallVariation[r][c];
+        target = constrain(target, 0, 1); // in case variation pushes it over 1
+      }
+
+      if (wallExpansion[r][c] < target) {
+        wallExpansion[r][c] = min(
+          wallExpansion[r][c] + WALL_EXPAND_SPEED,
+          target,
+        );
+      } else if (wallExpansion[r][c] > target) {
+        wallExpansion[r][c] = max(
+          wallExpansion[r][c] - WALL_SHRINK_SPEED,
+          target,
+        );
+      }
+    }
+  }
+}
+
+function getFlowingExpand(r, c) {
+  let base = wallExpansion[r][c] * WALL_MAX_EXPAND;
+
+  // Each tile gets its own noise "channel" via offset seeds (r, c),
+  // animated over time via frameCount. This makes every wall wobble
+  // independently and smoothly, rather than in lockstep.
+  let n = noise(c * 0.3, r * 0.3, frameCount * 0.01);
+
+  // Map noise (0–1) to a wobble range, e.g. ±3px
+  let wobble = map(n, 0, 1, -3, 3);
+
+  // Only wobble once the wall has started expanding —
+  // fully-open walls (expansion 0) shouldn't wiggle at all
+  wobble *= wallExpansion[r][c];
+
+  return base + wobble;
+}
+
+// COLLECTIBLES
 function setupCollectibles() {
   collectibles = [
     // Top section
@@ -786,6 +760,7 @@ function setupCollectibles() {
     },
   ];
 }
+
 function updateFireflies() {
   for (let item of collectibles) {
     if (item.collected) continue;
@@ -799,6 +774,7 @@ function updateFireflies() {
     }
   }
 }
+
 function drawCollectibles() {
   imageMode(CENTER);
 
@@ -826,24 +802,6 @@ function drawCollectibles() {
       FIREFLY.frameHeight,
     );
   }
-}
-
-function getFlowingExpand(r, c) {
-  let base = wallExpansion[r][c] * WALL_MAX_EXPAND;
-
-  // Each tile gets its own noise "channel" via offset seeds (r, c),
-  // animated over time via frameCount. This makes every wall wobble
-  // independently and smoothly, rather than in lockstep.
-  let n = noise(c * 0.3, r * 0.3, frameCount * 0.01);
-
-  // Map noise (0–1) to a wobble range, e.g. ±3px
-  let wobble = map(n, 0, 1, -3, 3);
-
-  // Only wobble once the wall has started expanding —
-  // fully-open walls (expansion 0) shouldn't wiggle at all
-  wobble *= wallExpansion[r][c];
-
-  return base + wobble;
 }
 
 function checkCollectibles() {
@@ -874,6 +832,7 @@ function checkCollectibles() {
   }
 }
 
+// DIALOGUE BOX (INTRO)
 function drawIntroDialogueBox() {
   const boxW = 900;
   const boxH = 140;
@@ -910,20 +869,7 @@ function drawIntroDialogueBox() {
   text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
 }
 
-function updateBadge() {
-  if (!badgeUnlocked) return;
-
-  if (badgeMessageTimer > 0) {
-    badgeMessageTimer--;
-  } else {
-    badgeX = lerp(badgeX, width - 120, 0.08);
-
-    badgeY = lerp(badgeY, 100, 0.08);
-
-    badgeScale = lerp(badgeScale, 0.25, 0.08);
-  }
-}
-
+// BADGE
 function drawBadge() {
   if (!badgeUnlocked) return;
 
@@ -957,6 +903,21 @@ function drawBadge() {
   }
 }
 
+function updateBadge() {
+  if (!badgeUnlocked) return;
+
+  if (badgeMessageTimer > 0) {
+    badgeMessageTimer--;
+  } else {
+    badgeX = lerp(badgeX, width - 120, 0.08);
+
+    badgeY = lerp(badgeY, 100, 0.08);
+
+    badgeScale = lerp(badgeScale, 0.25, 0.08);
+  }
+}
+
+// BLACK VIGNETTE ON SCREEN
 function drawVignette() {
   let ctx = drawingContext;
 
@@ -978,6 +939,7 @@ function drawVignette() {
   ctx.restore();
 }
 
+// MAZE
 function drawMaze() {
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
@@ -987,7 +949,6 @@ function drawMaze() {
 
       if (tile === 1) {
         let expand = wallExpansion[row][col] * WALL_MAX_EXPAND;
-        // draw brick image in each wall block
         image(
           wall,
           col * tileSize - expand,
@@ -996,15 +957,15 @@ function drawMaze() {
           tileSize + expand * 2,
         );
       } else {
-        // floor blocks
+        // Floor blocks
         if (tile === 0) {
           image(ground, col * tileSize, row * tileSize, tileSize, tileSize);
         }
-        // starting from home block
+        // Start from home block
         else if (tile === 2) {
           image(home, col * tileSize, row * tileSize, tileSize, tileSize);
         }
-        // exit to school block
+        // Exit to school block
         else if (tile === 3) {
           image(school, col * tileSize, row * tileSize, tileSize, tileSize);
         }
@@ -1012,6 +973,7 @@ function drawMaze() {
     }
   }
 
+  // Trapped Wall if Social Battery = 0
   if (socialBattery <= 0) {
     socialBattery = 0;
     trappedTimer++;
@@ -1022,38 +984,42 @@ function drawMaze() {
   }
 }
 
+// HEADS-UP DISPLAY (HUD)
 function drawSocialBar() {
   fill(5, 8, 65);
   image(banner, 0, 0, width, 60);
 
+  // Objective
   fill(255);
   textAlign(LEFT, TOP);
   textFont("Monospace");
   textSize(15);
   text("LVL 1: Make your way to school!", 50, 24);
+
+  // Firefly Count
   textSize(15);
   text(
     "Fireflies: " + collectedCount + " / " + collectibles.length,
     50,
     height - 34,
   );
+
+  // Controls
   text("W A S D to move", 50, height - 14);
 
+  // Social Battery Bar
   textAlign(RIGHT, TOP);
   fill(255);
   textSize(15);
   text("Social Battery", 980, 25);
-
   fill(80);
   rect(1000, 20, 190, 20);
-
   fill(100, 220, 120);
   rect(1000, 20, socialBattery * 1.9, 20);
 
   // Help button at the end of social battery bar
   fill(255, 220, 120);
   circle(1225, 30, 30);
-
   fill(0);
   textAlign(CENTER, CENTER);
   textSize(15);
@@ -1061,14 +1027,51 @@ function drawSocialBar() {
   text("?", 1225, 30);
 }
 
-// after
-function updateLasers() {
-  for (let l of lasers) {
-    l.timer++;
-    if (l.timer >= l.blinkRate) {
-      l.timer = 0;
-      l.on = !l.on;
+// LASERS
+function checkLaserPlayerCollision() {
+  if (playerInvincible) return;
+
+  let feetY = player.y + HITBOX_OFFSET_Y;
+
+  for (let l of laserBeams) {
+    if (!l.on) continue;
+
+    let minX = min(l.x1, l.x2) - HITBOX_RADIUS;
+    let maxX = max(l.x1, l.x2) + HITBOX_RADIUS;
+    let minY = min(l.y1, l.y2) - HITBOX_RADIUS;
+    let maxY = max(l.y1, l.y2) + HITBOX_RADIUS;
+
+    let hit =
+      player.x > minX && player.x < maxX && feetY > minY && feetY < maxY;
+
+    if (hit) {
+      socialBattery -= LASER_DAMAGE;
+
+      if (socialBattery < 0) socialBattery = 0;
+
+      // INSERT GAME OVER SCREEN
+
+      playerInvincible = true;
+      invincibleTimer = INVINCIBLE_FRAMES;
+
+      playerHitSound.play();
+
+      hitFlashAlpha = HIT_FLASH_MAX;
     }
+  }
+}
+
+function drawRedFlash(alpha) {
+  let borderSize = 30;
+  noStroke();
+  fill(255, 0, 0, alpha);
+  rect(0, 0, width, height);
+}
+
+function updateInvincibility() {
+  if (playerInvincible) {
+    invincibleTimer--;
+    if (invincibleTimer <= 0) playerInvincible = false;
   }
 }
 
@@ -1131,14 +1134,27 @@ function drawLaserBeams() {
   }
 }
 
+function updateLasers() {
+  for (let l of lasers) {
+    l.timer++;
+    if (l.timer >= l.blinkRate) {
+      l.timer = 0;
+      l.on = !l.on;
+    }
+  }
+}
+
+// START SCREEN
 function drawStartScreen() {
   image(startScreen, 0, 0, width, height);
 }
 
+// LOSE SCREEN
 function drawLoseScreen() {
   image(restartScreen, 0, 0, width, height);
 }
 
+// RESTART SCREEN
 function restartGame() {
   socialBattery = 100;
   gameOver = false;
@@ -1160,11 +1176,11 @@ function restartGame() {
   }
 }
 
+
+// LEVEL 1 COMPLETE SCREEN
 function drawFirstLevelCompleteScreen() {
   image(levelOneComplete, 0, 0, width, height);
 }
-
-
 
 // TUTORIAL OVERLAY
 function drawTutorialOverlay() {
