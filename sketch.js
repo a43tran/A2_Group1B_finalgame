@@ -114,7 +114,7 @@ const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
 // PLAYER HITBOX
-const HITBOX_RADIUS = 6;
+const HITBOX_RADIUS = 12;
 const HITBOX_OFFSET_Y = 9;
 
 let lasers = [
