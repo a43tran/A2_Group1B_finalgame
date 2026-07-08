@@ -1011,9 +1011,6 @@ function drawSocialBar() {
     height - 34,
   );
 
-  // Controls
-  text("W A S D to move", 50, height - 14);
-
   // Social Battery Bar
   textAlign(RIGHT, TOP);
   fill(255);
