@@ -240,7 +240,7 @@ class Player {
 
   draw() {
     //This will flicker the character sprite when they get hit by laser
-    //  if (playerInvincible && floor(invincibleTimer / 6) % 2 === 0) return;
+      if (playerInvincible && floor(invincibleTimer / 6) % 2 === 0) return;
 
     let row = SPRITE.rows[this.facing];
     let frameW = SPRITE.frameWidth;
@@ -839,9 +839,9 @@ function checkCollectibles() {
 // DIALOGUE BOX (INTRO)
 function drawIntroDialogueBox() {
   const boxW = 900;
-  const boxH = 120;
+  const boxH = 140;
   const boxX = (width - boxW) / 2;
-  const boxY = height - boxH - 40;
+  const boxY = height - boxH - 60;
 
   fill(20, 20, 30, 230);
   stroke(255);
