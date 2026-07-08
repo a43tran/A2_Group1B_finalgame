@@ -50,6 +50,15 @@ const HIT_FLASH_DECAY = 8;
 const HITBOX_RADIUS = 8;
 const HITBOX_OFFSET_Y = 9;
 
+let introDialogueActive = false;
+let introDialogueIndex = 0;
+
+const introDialogue = [
+  "... School's starting soon, I should get going.",
+  "I don't want to be late for class!",
+  "Oh, and the fireflies! Don't forget the fireflies.",
+];
+
 let lasers = [
   //top most laser
   { row: 2.3, col: 6.3, facing: "up", blinkRate: 80, on: true, timer: 0 },
@@ -252,15 +261,15 @@ function tileCenter(col, row, offX, offY) {
   };
 }
 
-const WALL_MAX_EXPAND = 20;
-const WALL_EXPAND_SPEED = 0.05;
+const WALL_MAX_EXPAND = 25;
+const WALL_EXPAND_SPEED = 0.07;
 const WALL_SHRINK_SPEED = 0.02;
-const PROXIMITY_RADIUS = 4;
+const PROXIMITY_RADIUS = 7;
 
 function updateWallExpansion() {
   let batteryTarget = map(socialBattery, 100, 0, 0, 1);
   batteryTarget = constrain(batteryTarget, 0, 1);
-  batteryTarget = pow(batteryTarget, 3);
+  batteryTarget = pow(batteryTarget, 2.9);
 
   let playerCol = player.x / tileSize;
   let playerRow = player.y / tileSize;
@@ -341,8 +350,7 @@ function preload() {
 
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
 
-
-  forest = loadImage("assets/images/forest.png"); 
+  forest = loadImage("assets/images/forest.png");
   wall = loadImage("assets/images/trees.png");
   ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
@@ -434,6 +442,9 @@ function updateInvincibility() {
 }
 
 function draw() {
+  imageMode(CORNER);
+  rectMode(CORNER);
+
   background(forest);
   if (!gameStarted && !showTutorial) {
     drawStartScreen();
@@ -445,11 +456,30 @@ function draw() {
     return;
   }
 
-  if (firstLevelComplete) {
-    drawFirstLevelCompleteScreen();
-    return;
-  }
+if (firstLevelComplete) {
+  drawFirstLevelCompleteScreen();
+  return;
+}
+
+if (introDialogueActive) {
   updateCamera();
+  push();
+  let zoom = 3.5;
+  translate(width / 2, height / 2);
+  scale(zoom);
+  translate(-player.x, -player.y);
+
+  drawMaze();
+  player.draw();
+
+  pop();
+
+  drawSocialBar();
+  drawIntroDialogueBox();
+  return; // skip player movement, lasers, collectibles until she's done talking
+}
+
+updateCamera();
 
   if (gameOver) {
     drawLoseScreen();
@@ -490,9 +520,6 @@ function draw() {
 
   pop();
 
-  updateBadge();
-  drawBadge();
-
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
@@ -519,6 +546,14 @@ function draw() {
 }
 
 function keyPressed() {
+  if (introDialogueActive && (key === " " || keyCode === ENTER)) {
+    introDialogueIndex++;
+    if (introDialogueIndex >= introDialogue.length) {
+      introDialogueActive = false;
+    }
+    return;
+  }
+
   if (key === " " && !gameStarted) {
     showTutorial = true;
   }
@@ -533,10 +568,12 @@ function keyPressed() {
 }
 
 function mousePressed() {
-  // Help button on the HUD
-  if (mouseX >= 1210 && mouseX <= 1240 && mouseY >= 15 && mouseY <= 45) {
-    showTutorial = true;
-    return;
+   if (introDialogueActive) {
+    introDialogueIndex++;
+    if (introDialogueIndex >= introDialogue.length) {
+      introDialogueActive = false;
+    }
+    return; // don't let this click fall through to help button etc.
   }
 
   // Continue button
@@ -552,8 +589,16 @@ function mousePressed() {
       // Only start the game the very first time
       if (!gameStarted) {
         gameStarted = true;
+        introDialogueActive = true;
+        introDialogueIndex = 0;
       }
     }
+  }
+
+  // Help button on the HUD
+  if (mouseX >= 1210 && mouseX <= 1240 && mouseY >= 15 && mouseY <= 45) {
+    showTutorial = true;
+    return;
   }
 }
 
@@ -784,76 +829,85 @@ function checkCollectibles() {
       let d = dist(player.x, player.y, x, y);
 
       if (d < 20) {
-      item.collected = true;
-      collectedCount++;
-      collect.play();
+        item.collected = true;
+        collectedCount++;
+        collect.play();
 
-      if (
-    collectedCount === collectibles.length &&
-    !badgeUnlocked
-      ) {
-    badgeUnlocked = true;
+        if (collectedCount === collectibles.length && !badgeUnlocked) {
+          badgeUnlocked = true;
 
-    badgeX = width / 2;
-    badgeY = height / 2 - 80;
+          badgeX = width / 2;
+          badgeY = height / 2 - 80;
 
-    badgeScale = 1.3;
+          badgeScale = 1.3;
 
-    badgeMessageTimer = 180;
-  }
-}
+          badgeMessageTimer = 180;
+        }
+      }
     }
   }
 }
 
-function updateBadge() {
+function drawIntroDialogueBox() {
+  const boxW = 900;
+  const boxH = 140;
+  const boxX = (width - boxW) / 2;
+  const boxY = height - boxH - 40;
 
+  fill(20, 20, 30, 230);
+  stroke(255);
+  strokeWeight(2);
+  rect(boxX, boxY, boxW, boxH, 12);
+
+  noStroke();
+  fill(255, 220, 120);
+  textAlign(LEFT, TOP);
+  textFont("Monospace");
+  textStyle(BOLD);
+  textSize(18);
+  text("Faith", boxX + 30, boxY + 18);
+
+  fill(255);
+  textStyle(NORMAL);
+  textSize(16);
+  text(
+    introDialogue[introDialogueIndex],
+    boxX + 30,
+    boxY + 55,
+    boxW - 60,
+    boxH - 80
+  );
+
+  fill(200);
+  textAlign(RIGHT, BOTTOM);
+  textSize(13);
+  text("click or press SPACE to continue", boxX + boxW - 20, boxY + boxH - 12);
+}
+
+function updateBadge() {
   if (!badgeUnlocked) return;
 
   if (badgeMessageTimer > 0) {
-
     badgeMessageTimer--;
-
   } else {
+    badgeX = lerp(badgeX, width - 120, 0.08);
 
-    badgeX = lerp(
-      badgeX,
-      width - 120,
-      0.08
-    );
+    badgeY = lerp(badgeY, 100, 0.08);
 
-    badgeY = lerp(
-      badgeY,
-      100,
-      0.08
-    );
-
-    badgeScale = lerp(
-      badgeScale,
-      0.25,
-      0.08
-    );
+    badgeScale = lerp(badgeScale, 0.25, 0.08);
   }
 }
 
 function drawBadge() {
-
   if (!badgeUnlocked) return;
 
   imageMode(CENTER);
 
   let badgeSize = 300 * badgeScale;
 
-  image(
-    fireflyBadge,
-    badgeX,
-    badgeY,
-    badgeSize,
-    badgeSize
-  );
+  image(fireflyBadge, badgeX, badgeY, badgeSize, badgeSize);
 
   if (badgeMessageTimer > 0) {
-
     fill(255);
     stroke(0);
     strokeWeight(4);
@@ -861,24 +915,16 @@ function drawBadge() {
     textAlign(CENTER);
 
     textSize(26);
-    text(
-      "Firefly Collector Badge Earned!",
-      width / 2,
-      height / 2 + 130
-    );
+    text("Firefly Collector Badge Earned!", width / 2, height / 2 + 130);
 
     textSize(18);
 
-    text(
-      "You collected all 11 fireflies!",
-      width / 2,
-      height / 2 + 165
-    );
+    text("You collected all 11 fireflies!", width / 2, height / 2 + 165);
 
     text(
       "Don't forget to make your way to school.",
       width / 2,
-      height / 2 + 195
+      height / 2 + 195,
     );
 
     noStroke();
@@ -948,7 +994,6 @@ function drawMaze() {
       fail.play();
     }
   }
-  
 }
 
 function drawSocialBar() {
@@ -1060,91 +1105,6 @@ function drawLaserBeams() {
   }
 }
 
-function drawTutorialOverlay() {
-  // Dark background
-  fill(0, 180);
-  rect(0, 0, width, height);
-
-  // Main panel
-  const panelW = 780;
-  const panelH = 520;
-  const panelX = (width - panelW) / 2;
-  const panelY = (height - panelH) / 2;
-
-  fill(245);
-  rect(panelX, panelY, panelW, panelH, 15);
-
-  // ===== Title =====
-  fill(30);
-  textAlign(CENTER, TOP);
-  textSize(28);
-  textStyle(BOLD);
-  textFont("Monospace");
-  text("How to Play", width / 2, panelY + 40);
-
-  // ===== WASD Instructions =====
-  textStyle(NORMAL);
-  textSize(15);
-  text("Use WASD to move Faith through the maze.", width / 2, panelY + 80);
-
-  // ===== Three Boxes =====
-  const boxW = 170;
-  const boxH = 170;
-  const gap = 55;
-
-  const startX = width / 2 - (boxW * 3 + gap * 2) / 2;
-  const boxY = panelY + 135;
-
-  fill(30);
-
-  for (let i = 0; i < 3; i++) {
-    rect(startX + i * (boxW + gap), boxY, boxW, boxH, 10);
-  }
-
-  // ===== Instruction Text =====
-  fill(30);
-  textSize(16);
-  textAlign(CENTER, TOP);
-
-  text(
-    "Watch out for\nlasers on the walls.",
-    startX + boxW / 2,
-    boxY + boxH + 18,
-  );
-
-  text(
-    "Collect fireflies\nalong the way.",
-    startX + boxW + gap + boxW / 2,
-    boxY + boxH + 18,
-  );
-
-  text(
-    "Guide Faith\nto the end.",
-    startX + 2 * (boxW + gap) + boxW / 2,
-    boxY + boxH + 18,
-  );
-
-  // ===== Continue Button =====
-  tutorialButton.w = 180;
-  tutorialButton.h = 45;
-  tutorialButton.x = width / 2 - tutorialButton.w / 2;
-  tutorialButton.y = panelY + panelH - 100;
-
-  fill(55, 85, 180);
-  rect(
-    tutorialButton.x,
-    tutorialButton.y,
-    tutorialButton.w,
-    tutorialButton.h,
-    10,
-  );
-
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(18);
-  text("Continue", width / 2, tutorialButton.y + tutorialButton.h / 2);
-}
-
 function drawStartScreen() {
   image(startScreen, 0, 0, width, height);
 }
@@ -1176,4 +1136,150 @@ function restartGame() {
 
 function drawFirstLevelCompleteScreen() {
   image(levelOneComplete, 0, 0, width, height);
+}
+
+function drawTutorialOverlay() {
+  // Dark background
+  fill(0, 180);
+  rect(0, 0, width, height);
+
+  // Main panel
+  const panelW = 780;
+  const panelH = 520;
+  const panelX = (width - panelW) / 2;
+  const panelY = (height - panelH) / 2;
+
+  fill(245);
+  rect(panelX, panelY, panelW, panelH, 15);
+
+  // ===== Title =====
+  fill(30);
+  textAlign(CENTER, TOP);
+  textSize(28);
+  textStyle(BOLD);
+  textFont("Monospace");
+  text("How to Play", width / 2, panelY + 40);
+
+  // ===== WASD Instructions =====
+  textStyle(NORMAL);
+  textSize(15);
+  text(
+    " Help Faith find and collect every firefly as she makes her way through the maze!\n Use WASD to move Faith.",
+    width / 2,
+    panelY + 80,
+  );
+
+  // ===== Three Boxes =====
+  const boxW = 170;
+  const boxH = 170;
+  const gap = 55;
+
+  const startX = width / 2 - (boxW * 3 + gap * 2) / 2;
+  const boxY = panelY + 135;
+
+  // Draw forest background in each box
+  imageMode(CORNER);
+
+  for (let i = 0; i < 3; i++) {
+    let x = startX + i * (boxW + gap);
+
+    image(forest, x, boxY, boxW, boxH);
+
+    noFill();
+    stroke(40);
+    strokeWeight(2);
+    rect(x, boxY, boxW, boxH, 10);
+  }
+
+  noStroke();
+
+  // Sprites should use center mode
+  imageMode(CENTER);
+
+  // ================= IMAGES =================
+  imageMode(CENTER);
+
+  // ---------- Box 1 : Laser ----------
+  let laserX = startX + boxW / 2;
+  let laserY = boxY + boxH / 2;
+
+  image(laserOn, laserX, laserY, boxW * 0.75, boxH * 0.75);
+
+  // ---------- Box 2 : Firefly ----------
+  let fireflyX = startX + (boxW + gap) + boxW / 2 - 5;
+  let fireflyY = boxY + boxH / 2;
+
+  image(
+    fireflySprite,
+    fireflyX,
+    fireflyY,
+    120, // increase size
+    120,
+    0,
+    0,
+    FIREFLY.frameWidth,
+    FIREFLY.frameHeight,
+  );
+
+  // ---------- Box 3 : Faith ----------
+  let faithX = startX + 2 * (boxW + gap) + boxW / 2;
+  let faithY = boxY + boxH / 2 - 10;
+
+  // Animate walking
+  let frame = floor(frameCount / 12) % SPRITE.numFrames;
+
+  image(
+    character,
+    faithX,
+    faithY,
+    95, // wider
+    190, // taller
+    frame * SPRITE.frameWidth,
+    SPRITE.rows.right * SPRITE.frameHeight,
+    SPRITE.frameWidth,
+    SPRITE.frameHeight,
+  );
+
+  // ===== Instruction Text =====
+  fill(30);
+  textSize(16);
+  textAlign(CENTER, TOP);
+
+  text(
+    "Watch out for\nlasers on the walls!",
+    startX + boxW / 2,
+    boxY + boxH + 18,
+  );
+
+  text(
+    "Collect fireflies\nalong the way!",
+    startX + boxW + gap + boxW / 2,
+    boxY + boxH + 18,
+  );
+
+  text(
+    "Guide Faith\nto the end!",
+    startX + 2 * (boxW + gap) + boxW / 2,
+    boxY + boxH + 18,
+  );
+
+  // ===== Continue Button =====
+  tutorialButton.w = 180;
+  tutorialButton.h = 45;
+  tutorialButton.x = width / 2 - tutorialButton.w / 2;
+  tutorialButton.y = panelY + panelH - 100;
+
+  fill(55, 85, 180);
+  rect(
+    tutorialButton.x,
+    tutorialButton.y,
+    tutorialButton.w,
+    tutorialButton.h,
+    10,
+  );
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(18);
+  text("Continue", width / 2, tutorialButton.y + tutorialButton.h / 2);
 }
