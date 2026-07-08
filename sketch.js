@@ -240,8 +240,6 @@ function initWallExpansion() {
     wallVariation[r] = [];
     for (let c = 0; c < COLS; c++) {
       wallExpansion[r][c] = 0;
-      // Random multiplier per wall tile, e.g. 0.6–1.3x
-      // so some walls barely move while others close in hard
       wallVariation[r][c] = random(0.6, 1.3);
     }
   }
@@ -344,7 +342,7 @@ function preload() {
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
 
 
-  forest = loadImage("assets/images/forest.png");
+  forest = loadImage("assets/images/forest.png"); 
   wall = loadImage("assets/images/trees.png");
   ground = loadImage("assets/images/dirt.png");
   home = loadImage("assets/images/house.png");
@@ -491,6 +489,9 @@ function draw() {
   updateInvincibility();
 
   pop();
+
+  updateBadge();
+  drawBadge();
 
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
@@ -783,11 +784,104 @@ function checkCollectibles() {
       let d = dist(player.x, player.y, x, y);
 
       if (d < 20) {
-        item.collected = true;
-        collectedCount++;
-        collect.play();
-      }
+      item.collected = true;
+      collectedCount++;
+      collect.play();
+
+      if (
+    collectedCount === collectibles.length &&
+    !badgeUnlocked
+      ) {
+    badgeUnlocked = true;
+
+    badgeX = width / 2;
+    badgeY = height / 2 - 80;
+
+    badgeScale = 1.3;
+
+    badgeMessageTimer = 180;
+  }
+}
     }
+  }
+}
+
+function updateBadge() {
+
+  if (!badgeUnlocked) return;
+
+  if (badgeMessageTimer > 0) {
+
+    badgeMessageTimer--;
+
+  } else {
+
+    badgeX = lerp(
+      badgeX,
+      width - 120,
+      0.08
+    );
+
+    badgeY = lerp(
+      badgeY,
+      100,
+      0.08
+    );
+
+    badgeScale = lerp(
+      badgeScale,
+      0.25,
+      0.08
+    );
+  }
+}
+
+function drawBadge() {
+
+  if (!badgeUnlocked) return;
+
+  imageMode(CENTER);
+
+  let badgeSize = 300 * badgeScale;
+
+  image(
+    fireflyBadge,
+    badgeX,
+    badgeY,
+    badgeSize,
+    badgeSize
+  );
+
+  if (badgeMessageTimer > 0) {
+
+    fill(255);
+    stroke(0);
+    strokeWeight(4);
+
+    textAlign(CENTER);
+
+    textSize(26);
+    text(
+      "Firefly Collector Badge Earned!",
+      width / 2,
+      height / 2 + 130
+    );
+
+    textSize(18);
+
+    text(
+      "You collected all 11 fireflies!",
+      width / 2,
+      height / 2 + 165
+    );
+
+    text(
+      "Now make your way to school.",
+      width / 2,
+      height / 2 + 195
+    );
+
+    noStroke();
   }
 }
 
@@ -854,16 +948,6 @@ function drawMaze() {
       fail.play();
     }
   }
-if (tile === 1) {
-  let expand = getFlowingExpand(r, c); // was: wallExpansion[row][col] * WALL_MAX_EXPAND
-  image(
-    wall,
-    col * tileSize - expand,
-    row * tileSize - expand,
-    tileSize + expand * 2,
-    tileSize + expand * 2,
-  );
-}
   
 }
 
