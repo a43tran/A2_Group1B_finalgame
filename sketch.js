@@ -556,6 +556,11 @@ function keyPressed() {
 
   if (key === " " && !gameStarted) {
     showTutorial = true;
+    
+    // start background music once
+    if (!bgMusic.isPlaying()) {
+      bgMusic.loop(); // loop keeps it playing continuously
+    }
   }
 
   if (key === "r" || key === "R") {
