@@ -47,8 +47,8 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
-const HITBOX_RADIUS = 10;
-const HITBOX_OFFSET_Y = 8;
+const HITBOX_RADIUS = 6;
+const HITBOX_OFFSET_Y = 9;
 
 let lasers = [
   //top most laser
@@ -296,11 +296,11 @@ function updateWallExpansion() {
 }
 
 const SPRITE = {
-  frameWidth: 75,
-  frameHeight: 150,
+  frameWidth: 150,
+  frameHeight: 300,
   numFrames: 4,
   animSpeed: 20,
-  scale: 0.5,
+  scale: 0.2,
   rows: {
     down: 0,
     up: 1,

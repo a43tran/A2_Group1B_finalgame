@@ -1,4 +1,4 @@
-# Week 5 Example 3 — Maze with Animated Character and Coins
+# A2: Mid-Term Game
 
 ## What This Example Demonstrates
 
