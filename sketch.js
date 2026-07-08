@@ -10,6 +10,17 @@ let thirdLevelComplete = false;
 let socialBattery = 100;
 let fireflySprite;
 
+let fireflyBadge;
+
+let badgeUnlocked = false;
+
+let badgeX = 0;
+let badgeY = 0;
+
+let badgeScale = 1;
+
+let badgeMessageTimer = 0;
+
 let trappedTimer = 0;
 const TRAPPED_DELAY = 30;
 
@@ -221,12 +232,17 @@ class Player {
 }
 
 let wallExpansion = [];
+let wallVariation = [];
 
 function initWallExpansion() {
   for (let r = 0; r < ROWS; r++) {
     wallExpansion[r] = [];
+    wallVariation[r] = [];
     for (let c = 0; c < COLS; c++) {
       wallExpansion[r][c] = 0;
+      // Random multiplier per wall tile, e.g. 0.6–1.3x
+      // so some walls barely move while others close in hard
+      wallVariation[r][c] = random(0.6, 1.3);
     }
   }
 }
@@ -246,9 +262,6 @@ const PROXIMITY_RADIUS = 4;
 function updateWallExpansion() {
   let batteryTarget = map(socialBattery, 100, 0, 0, 1);
   batteryTarget = constrain(batteryTarget, 0, 1);
-
-  // Steepen the curve so walls stay fairly open through mid-battery,
-  // then close in sharply as it approaches 0
   batteryTarget = pow(batteryTarget, 3);
 
   let playerCol = player.x / tileSize;
@@ -261,9 +274,13 @@ function updateWallExpansion() {
       let d = dist(c, r, playerCol, playerRow);
       let proximity = constrain(map(d, 0, PROXIMITY_RADIUS, 1, 0), 0, 1);
 
-      // At 0 battery, ignore proximity entirely — every wall in the maze
-      // slams to max, not just the ones near the player
-      let target = socialBattery <= 0 ? 1 : batteryTarget * proximity;
+      let target;
+      if (socialBattery <= 0) {
+        target = 1; // still fully locks at zero, variation doesn't apply here
+      } else {
+        target = batteryTarget * proximity * wallVariation[r][c];
+        target = constrain(target, 0, 1); // in case variation pushes it over 1
+      }
 
       if (wallExpansion[r][c] < target) {
         wallExpansion[r][c] = min(
@@ -323,6 +340,9 @@ function preload() {
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
   fireflySprite = loadImage("assets/images/firefly.png");
+
+  fireflyBadge = loadImage("assets/images/fireflybadge.png");
+
 
   forest = loadImage("assets/images/forest.png");
   wall = loadImage("assets/images/trees.png");
@@ -563,7 +583,7 @@ function canMoveTo(x, y) {
         if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
         if (maze[nr][nc] !== 1) continue;
 
-        let expand = wallExpansion[nr][nc] * WALL_MAX_EXPAND;
+        let expand = getFlowingExpand(nr, nc);
         let left = nc * tileSize - expand;
         let right = nc * tileSize + tileSize + expand;
         let top = nr * tileSize - expand;
@@ -586,7 +606,7 @@ function resolveWallPush() {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] !== 1) continue;
 
-      let expand = wallExpansion[r][c] * WALL_MAX_EXPAND;
+      let expand = getFlowingExpand(r, c);
 
       let wallLeft = c * tileSize - expand;
       let wallRight = c * tileSize + tileSize + expand;
@@ -736,6 +756,24 @@ function drawCollectibles() {
   }
 }
 
+function getFlowingExpand(r, c) {
+  let base = wallExpansion[r][c] * WALL_MAX_EXPAND;
+
+  // Each tile gets its own noise "channel" via offset seeds (r, c),
+  // animated over time via frameCount. This makes every wall wobble
+  // independently and smoothly, rather than in lockstep.
+  let n = noise(c * 0.3, r * 0.3, frameCount * 0.01);
+
+  // Map noise (0–1) to a wobble range, e.g. ±3px
+  let wobble = map(n, 0, 1, -3, 3);
+
+  // Only wobble once the wall has started expanding —
+  // fully-open walls (expansion 0) shouldn't wiggle at all
+  wobble *= wallExpansion[r][c];
+
+  return base + wobble;
+}
+
 function checkCollectibles() {
   for (let item of collectibles) {
     if (!item.collected) {
@@ -816,6 +854,17 @@ function drawMaze() {
       fail.play();
     }
   }
+if (tile === 1) {
+  let expand = getFlowingExpand(r, c); // was: wallExpansion[row][col] * WALL_MAX_EXPAND
+  image(
+    wall,
+    col * tileSize - expand,
+    row * tileSize - expand,
+    tileSize + expand * 2,
+    tileSize + expand * 2,
+  );
+}
+  
 }
 
 function drawSocialBar() {
