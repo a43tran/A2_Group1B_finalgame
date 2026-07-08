@@ -318,7 +318,6 @@ function preload() {
   restartScreen = loadImage("assets/images/restartscreen.png");
   levelOneComplete = loadImage("assets/images/level1complete.png");
   fireflySprite = loadImage("assets/images/firefly.png");
-
   fireflyBadge = loadImage("assets/images/fireflybadge.png");
 
   forest = loadImage("assets/images/forest.png");
@@ -337,6 +336,7 @@ function preload() {
   win = loadSound("assets/sounds/win.mp3");
   collect = loadSound("assets/sounds/collect.mp3");
   walking = loadSound("assets/sounds/walking.mp3");
+  bgMusic = loadSound("assets/sounds/bgmusic.mp3");
 }
 
 function setup() {
@@ -443,6 +443,9 @@ function draw() {
   updateInvincibility();
 
   pop();
+
+  updateBadge();
+  drawBadge();
 
   if (hitFlashAlpha > 0) {
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
