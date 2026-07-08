@@ -839,7 +839,7 @@ function checkCollectibles() {
 // DIALOGUE BOX (INTRO)
 function drawIntroDialogueBox() {
   const boxW = 900;
-  const boxH = 140;
+  const boxH = 120;
   const boxX = (width - boxW) / 2;
   const boxY = height - boxH - 40;
 
