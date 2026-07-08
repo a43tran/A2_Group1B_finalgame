@@ -876,7 +876,7 @@ function drawBadge() {
     );
 
     text(
-      "Now make your way to school.",
+      "Don't forget to make your way to school.",
       width / 2,
       height / 2 + 195
     );
@@ -966,6 +966,7 @@ function drawSocialBar() {
     50,
     height - 34,
   );
+  text("W A S D to move", 50, height - 14);
 
   textAlign(RIGHT, TOP);
   fill(255);
