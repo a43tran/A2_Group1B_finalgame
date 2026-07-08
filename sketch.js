@@ -1,45 +1,103 @@
+// MAZE GRID
 const tileSize = 40;
 const COLS = 25;
 const ROWS = 14;
 
+// 0 = path
+// 1 = wall
+// 2 = start
+// 3 = end
+
+// MAZE MAP
+let maze = [
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 3, 1],
+  [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
+  [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1],
+  [1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
+  [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1],
+  [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1],
+  [1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1],
+  [1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+  [1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+  [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+  [1, 2, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+];
+
+// GAME STATE & LEVELS
 let gameStarted = false;
 let gameOver = false;
 let firstLevelComplete = false;
 let secondLevelComplete = false;
 let thirdLevelComplete = false;
-let socialBattery = 100;
+
+// IMAGES
+let character;
+let startScreen;
+let restartScreen;
+let levelOneComplete;
 let fireflySprite;
-
 let fireflyBadge;
+let forest;
+let wall;
+let ground;
+let home;
+let school;
+let banner;
+let laserOn;
+let laserOff;
 
+// SOUNDS
+let playerHitSound;
+let fail;
+let win;
+let collect;
+let walking;
+
+// SOCIAL BATTERY
+let socialBattery = 100;
+
+// FIREFLY BADGE
 let badgeUnlocked = false;
-
 let badgeX = 0;
 let badgeY = 0;
-
 let badgeScale = 1;
-
 let badgeMessageTimer = 0;
 
+// FIREFLY SPRITE SHEET
+const FIREFLY = {
+  frameWidth: 276.125,
+  frameHeight: 268,
+  numFrames: 8,
+  animSpeed: 11,
+  scale: 0.09,
+};
+
+// WALL MECHANIC (LOSE STATE)
 let trappedTimer = 0;
 const TRAPPED_DELAY = 30;
 
+// PLAYER PERSPECTIVE
 let camX = 0;
 let camY = 0;
 const CAM_SMOOTHING = 0.1;
 
-let playerHitSound;
+// DIALOGUE (INTRO)
+let introDialogueActive = false;
+let introDialogueIndex = 0;
+const introDialogue = [
+  "... School's starting soon, I should get going.",
+  "I don't want to be late for class!",
+  "Oh, and the fireflies! Don't forget the fireflies.",
+];
 
-// initializng frame to buffer damage rate
+// LASER DAMAGE
 const INVINCIBLE_FRAMES = 60;
-
-// set current player "invincibility" to false
 let playerInvincible = false;
-
-// initialize invincible timer
 let invincibleTimer = 0;
 
-// initilize the laser damage
 const LASER_DAMAGE = 10;
 
 // FOR BORDERS | i.e. for when player gets hit by the laser beams
@@ -47,17 +105,9 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
+// PLAYER HITBOX
 const HITBOX_RADIUS = 6;
 const HITBOX_OFFSET_Y = 9;
-
-let introDialogueActive = false;
-let introDialogueIndex = 0;
-
-const introDialogue = [
-  "... School's starting soon, I should get going.",
-  "I don't want to be late for class!",
-  "Oh, and the fireflies! Don't forget the fireflies.",
-];
 
 let lasers = [
   //top most laser
@@ -112,34 +162,10 @@ let laserBeams = [
   },
 ];
 
-// 0 = path
-// 1 = wall
-// 2 = start
-// 3 = end
-
-// Maze map
-let maze = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 3, 1],
-  [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-  [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1],
-  [1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1],
-  [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1],
-  [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1],
-  [1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1],
-  [1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
-  [1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
-  [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-  [1, 2, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-];
-
-//Player model constructor
+// PLAYER MODEL CONSTRUCTOR
 let player;
 let collectibles = [];
 let collectedCount = 0;
-//const totalCollectibles = ;
 
 class Player {
   constructor(x, y) {
@@ -180,7 +206,7 @@ class Player {
       this.vx = 0;
       this.vy = 0;
       if (walking.isPlaying()) walking.stop();
-      return; // skip all movement logic entirely
+      return;
     }
 
     let nextX = this.x + this.vx * this.speed;
@@ -240,6 +266,38 @@ class Player {
   }
 }
 
+// PLAYER SPRITE SHEET
+const SPRITE = {
+  frameWidth: 150,
+  frameHeight: 300,
+  numFrames: 4,
+  animSpeed: 20,
+  scale: 0.2,
+  rows: {
+    down: 0,
+    up: 1,
+    right: 2,
+    left: 3,
+  },
+  offsets: {
+    down: { x: 0, y: 0 },
+    up: { x: 0, y: 0 },
+    right: { x: 0.1, y: -10 },
+    left: { x: 2.2, y: -10 },
+  },
+};
+
+// TUTORIAL PAGE
+let showTutorial = false;
+
+const tutorialButton = {
+  x: 290,
+  y: 420,
+  w: 220,
+  h: 50,
+};
+
+// WALL EXPANSION MECHANIC
 let wallExpansion = [];
 let wallVariation = [];
 
@@ -303,43 +361,6 @@ function updateWallExpansion() {
     }
   }
 }
-
-const SPRITE = {
-  frameWidth: 150,
-  frameHeight: 300,
-  numFrames: 4,
-  animSpeed: 20,
-  scale: 0.2,
-  rows: {
-    down: 0,
-    up: 1,
-    right: 2,
-    left: 3,
-  },
-  offsets: {
-    down: { x: 0, y: 0 },
-    up: { x: 0, y: 0 },
-    right: { x: 0.1, y: -10 },
-    left: { x: 2.2, y: -10 },
-  },
-};
-
-const FIREFLY = {
-  frameWidth: 276.125,
-  frameHeight: 268,
-  numFrames: 8,
-  animSpeed: 11,
-  scale: 0.09,
-};
-
-let showTutorial = false;
-
-const tutorialButton = {
-  x: 290,
-  y: 420,
-  w: 220,
-  h: 50,
-};
 
 function preload() {
   character = loadImage("assets/images/character.png");
@@ -456,30 +477,30 @@ function draw() {
     return;
   }
 
-if (firstLevelComplete) {
-  drawFirstLevelCompleteScreen();
-  return;
-}
+  if (firstLevelComplete) {
+    drawFirstLevelCompleteScreen();
+    return;
+  }
 
-if (introDialogueActive) {
+  if (introDialogueActive) {
+    updateCamera();
+    push();
+    let zoom = 3.5;
+    translate(width / 2, height / 2);
+    scale(zoom);
+    translate(-player.x, -player.y);
+
+    drawMaze();
+    player.draw();
+
+    pop();
+
+    drawSocialBar();
+    drawIntroDialogueBox();
+    return; // skip player movement, lasers, collectibles until she's done talking
+  }
+
   updateCamera();
-  push();
-  let zoom = 3.5;
-  translate(width / 2, height / 2);
-  scale(zoom);
-  translate(-player.x, -player.y);
-
-  drawMaze();
-  player.draw();
-
-  pop();
-
-  drawSocialBar();
-  drawIntroDialogueBox();
-  return; // skip player movement, lasers, collectibles until she's done talking
-}
-
-updateCamera();
 
   if (gameOver) {
     drawLoseScreen();
@@ -556,7 +577,7 @@ function keyPressed() {
 
   if (key === " " && !gameStarted) {
     showTutorial = true;
-    
+
     // start background music once
     if (!bgMusic.isPlaying()) {
       bgMusic.loop(); // loop keeps it playing continuously
@@ -573,7 +594,7 @@ function keyPressed() {
 }
 
 function mousePressed() {
-   if (introDialogueActive) {
+  if (introDialogueActive) {
     introDialogueIndex++;
     if (introDialogueIndex >= introDialogue.length) {
       introDialogueActive = false;
@@ -880,7 +901,7 @@ function drawIntroDialogueBox() {
     boxX + 30,
     boxY + 55,
     boxW - 60,
-    boxH - 80
+    boxH - 80,
   );
 
   fill(200);
@@ -1143,8 +1164,10 @@ function drawFirstLevelCompleteScreen() {
   image(levelOneComplete, 0, 0, width, height);
 }
 
+
+
+// TUTORIAL OVERLAY
 function drawTutorialOverlay() {
-  // Dark background
   fill(0, 180);
   rect(0, 0, width, height);
 
@@ -1157,7 +1180,7 @@ function drawTutorialOverlay() {
   fill(245);
   rect(panelX, panelY, panelW, panelH, 15);
 
-  // ===== Title =====
+  // Title
   fill(30);
   textAlign(CENTER, TOP);
   textSize(28);
@@ -1165,7 +1188,7 @@ function drawTutorialOverlay() {
   textFont("Monospace");
   text("How to Play", width / 2, panelY + 40);
 
-  // ===== WASD Instructions =====
+  // WASD Instructions
   textStyle(NORMAL);
   textSize(15);
   text(
@@ -1174,7 +1197,7 @@ function drawTutorialOverlay() {
     panelY + 80,
   );
 
-  // ===== Three Boxes =====
+  // Three Boxes
   const boxW = 170;
   const boxH = 170;
   const gap = 55;
@@ -1198,27 +1221,22 @@ function drawTutorialOverlay() {
 
   noStroke();
 
-  // Sprites should use center mode
+  // Images in each box
   imageMode(CENTER);
 
-  // ================= IMAGES =================
-  imageMode(CENTER);
-
-  // ---------- Box 1 : Laser ----------
+  // Box 1: Laser
   let laserX = startX + boxW / 2;
   let laserY = boxY + boxH / 2;
-
   image(laserOn, laserX, laserY, boxW * 0.75, boxH * 0.75);
 
-  // ---------- Box 2 : Firefly ----------
+  // Box 2: Firefly
   let fireflyX = startX + (boxW + gap) + boxW / 2 - 5;
   let fireflyY = boxY + boxH / 2;
-
   image(
     fireflySprite,
     fireflyX,
     fireflyY,
-    120, // increase size
+    120, 
     120,
     0,
     0,
@@ -1226,7 +1244,7 @@ function drawTutorialOverlay() {
     FIREFLY.frameHeight,
   );
 
-  // ---------- Box 3 : Faith ----------
+  // Box 3: Player (Faith
   let faithX = startX + 2 * (boxW + gap) + boxW / 2;
   let faithY = boxY + boxH / 2 - 10;
 
@@ -1245,7 +1263,7 @@ function drawTutorialOverlay() {
     SPRITE.frameHeight,
   );
 
-  // ===== Instruction Text =====
+  // Instruction Text
   fill(30);
   textSize(16);
   textAlign(CENTER, TOP);
@@ -1268,7 +1286,7 @@ function drawTutorialOverlay() {
     boxY + boxH + 18,
   );
 
-  // ===== Continue Button =====
+  // Continue Button
   tutorialButton.w = 180;
   tutorialButton.h = 45;
   tutorialButton.x = width / 2 - tutorialButton.w / 2;
