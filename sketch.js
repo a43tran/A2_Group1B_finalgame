@@ -28,7 +28,7 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
-//
+// FOR BORDERS | i.e. for when player gets hit by the laser beams 
 let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
@@ -279,11 +279,11 @@ const SPRITE = {
 };
 
 const FIREFLY = {
-  frameWidth: 340,
-  frameHeight: 512,
+  frameWidth: 276.125,
+  frameHeight: 268,
   numFrames: 8,
-  animSpeed: 28,
-  scale: 0.08,
+  animSpeed: 11,
+  scale: 0.12,
 };
 
 let showTutorial = false;
@@ -377,9 +377,19 @@ function checkLaserPlayerCollision() {
     invincibleTimer = INVINCIBLE_FRAMES;
 
     playerHitSound.play()
+
+    hitFlashAlpha = HIT_FLASH_MAX
   }
 }
 }
+
+function drawRedFlash(alpha) {
+  let borderSize = 30;
+  noStroke();
+  fill(255, 0, 0, alpha);
+  rect(0,0, width, height)
+}
+
 function updateInvincibility() {
   if (playerInvincible) {
     invincibleTimer--;
@@ -448,6 +458,12 @@ updateInvincibility();
 
 
   pop();
+
+  if (hitFlashAlpha > 0) {
+    hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
+    drawRedFlash(hitFlashAlpha);
+  }
+
 
   drawVignette();
 
