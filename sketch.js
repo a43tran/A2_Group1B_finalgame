@@ -231,28 +231,38 @@ function tileCenter(col, row, offX, offY) {
 const WALL_MAX_EXPAND = 12;
 const WALL_EXPAND_SPEED = 0.04;
 const WALL_SHRINK_SPEED = 0.02;
+const PROXIMITY_RADIUS = 4
 
 function updateWallExpansion() {
   // How "closed in" the walls should be, driven by social battery instead of player position.
   // Full battery (100) -> target 0 (walls fully open)
   // Empty battery (0)  -> target 1 (walls fully expanded/closed in)
-  let target = map(socialBattery, 100, 0, 0, 1);
-  target = constrain(target, 0, 1);
+ let batteryTarget = map(socialBattery, 100, 0, 0, 1);
+  batteryTarget = constrain(batteryTarget, 0, 1);
+
+  let playerCol = player.x / tileSize;
+  let playerRow = player.y / tileSize;
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       if (maze[r][c] !== 1) continue; // only walls
 
+      // Distance from this wall tile to the player, in tiles
+      let d = dist(c, r, playerCol, playerRow);
+
+      // Falloff: 1 when right next to player, fading to 0 beyond PROXIMITY_RADIUS
+      let proximity = constrain(map(d, 0, PROXIMITY_RADIUS, 1, 0), 0, 1);
+
+      // Blend: battery sets the overall "how bad is it" level,
+      // proximity decides how much of that shows up on THIS wall tile.
+      // Walls right next to the player fully reflect batteryTarget;
+      // far-away walls stay near 0 regardless of battery.
+      let target = batteryTarget * proximity;
+
       if (wallExpansion[r][c] < target) {
-        wallExpansion[r][c] = min(
-          wallExpansion[r][c] + WALL_EXPAND_SPEED,
-          target,
-        );
+        wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, target);
       } else if (wallExpansion[r][c] > target) {
-        wallExpansion[r][c] = max(
-          wallExpansion[r][c] - WALL_SHRINK_SPEED,
-          target,
-        );
+        wallExpansion[r][c] = max(wallExpansion[r][c] - WALL_SHRINK_SPEED, target);
       }
     }
   }
@@ -283,7 +293,7 @@ const FIREFLY = {
   frameHeight: 268,
   numFrames: 8,
   animSpeed: 11,
-  scale: 0.12,
+  scale: 0.09,
 };
 
 let showTutorial = false;
