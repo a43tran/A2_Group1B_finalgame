@@ -47,7 +47,7 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
-const HITBOX_RADIUS = 8;
+const HITBOX_RADIUS = 6;
 const HITBOX_OFFSET_Y = 9;
 
 let introDialogueActive = false;
@@ -261,15 +261,15 @@ function tileCenter(col, row, offX, offY) {
   };
 }
 
-const WALL_MAX_EXPAND = 25;
-const WALL_EXPAND_SPEED = 0.07;
+const WALL_MAX_EXPAND = 23;
+const WALL_EXPAND_SPEED = 0.06;
 const WALL_SHRINK_SPEED = 0.02;
 const PROXIMITY_RADIUS = 7;
 
 function updateWallExpansion() {
   let batteryTarget = map(socialBattery, 100, 0, 0, 1);
   batteryTarget = constrain(batteryTarget, 0, 1);
-  batteryTarget = pow(batteryTarget, 2.9);
+  batteryTarget = pow(batteryTarget, 3);
 
   let playerCol = player.x / tileSize;
   let playerRow = player.y / tileSize;
