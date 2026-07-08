@@ -274,10 +274,10 @@ const SPRITE = {
 };
 
 const FIREFLY = {
-  frameWidth: 347,
+  frameWidth: 340,
   frameHeight: 512,
   numFrames: 8,
-  animSpeed: 6,
+  animSpeed: 28,
   scale: 0.08,
 };
 
@@ -307,7 +307,8 @@ function preload() {
   laserOn = loadImage("assets/images/laserOn.png");
   laserOff = loadImage("assets/images/laserOff.png");
 
-  //playerHitSound = loadSound("assets/sounds/xxxxxxxx.mp3")
+  playerHitSound = loadSound("assets/sounds/hit.mp3")
+
   fail = loadSound("assets/sounds/fail.mp3");
   win = loadSound("assets/sounds/win.mp3");
   collect = loadSound("assets/sounds/collect.mp3");
@@ -370,19 +371,16 @@ function checkLaserPlayerCollision() {
     playerInvincible = true;
     invincibleTimer = INVINCIBLE_FRAMES;
 
-    //playerHitSound.play()
+    playerHitSound.play()
   }
 }
-
+}
 function updateInvincibility() {
   if (playerInvincible) {
     invincibleTimer--;
     if (invincibleTimer <= 0)
       playerInvincible = false;
   }
-}
-
-
 }
 
 
@@ -425,6 +423,7 @@ function draw() {
 
   player.update();
   resolveWallPush();
+
 
   updateLaserBeams();
   drawLaserBeams();
