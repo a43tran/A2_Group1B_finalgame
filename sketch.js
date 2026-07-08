@@ -28,6 +28,11 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
+//
+let hitFlashAlpha = 0;
+const HIT_FLASH_MAX = 150;
+const HIT_FLASH_DECAY = 8;
+
 const HITBOX_RADIUS = 10;
 const HITBOX_OFFSET_Y = 8;
 
