@@ -10,6 +10,9 @@ let thirdLevelComplete = false;
 let socialBattery = 100;
 let fireflySprite;
 
+let trappedTimer = 0;
+const TRAPPED_DELAY = 30;
+
 let camX = 0;
 let camY = 0;
 const CAM_SMOOTHING = 0.1;
@@ -28,7 +31,7 @@ let invincibleTimer = 0;
 // initilize the laser damage
 const LASER_DAMAGE = 10;
 
-// FOR BORDERS | i.e. for when player gets hit by the laser beams 
+// FOR BORDERS | i.e. for when player gets hit by the laser beams
 let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
@@ -153,10 +156,17 @@ class Player {
     if (this.vy === -1) this.facing = "up";
     if (this.vy === 1) this.facing = "down";
 
+    if (socialBattery <= 0) {
+      this.vx = 0;
+      this.vy = 0;
+      if (walking.isPlaying()) walking.stop();
+      return; // skip all movement logic entirely
+    }
+
     let nextX = this.x + this.vx * this.speed;
     let nextY = this.y + this.vy * this.speed;
 
-    const isMoving = (this.vx !== 0 || this.vy !== 0);
+    const isMoving = this.vx !== 0 || this.vy !== 0;
 
     if (isMoving && !walking.isPlaying()) {
       walking.play();
@@ -228,41 +238,43 @@ function tileCenter(col, row, offX, offY) {
   };
 }
 
-const WALL_MAX_EXPAND = 12;
-const WALL_EXPAND_SPEED = 0.04;
+const WALL_MAX_EXPAND = 20;
+const WALL_EXPAND_SPEED = 0.05;
 const WALL_SHRINK_SPEED = 0.02;
-const PROXIMITY_RADIUS = 4
+const PROXIMITY_RADIUS = 4;
 
 function updateWallExpansion() {
-  // How "closed in" the walls should be, driven by social battery instead of player position.
-  // Full battery (100) -> target 0 (walls fully open)
-  // Empty battery (0)  -> target 1 (walls fully expanded/closed in)
- let batteryTarget = map(socialBattery, 100, 0, 0, 1);
+  let batteryTarget = map(socialBattery, 100, 0, 0, 1);
   batteryTarget = constrain(batteryTarget, 0, 1);
+
+  // Steepen the curve so walls stay fairly open through mid-battery,
+  // then close in sharply as it approaches 0
+  batteryTarget = pow(batteryTarget, 3);
 
   let playerCol = player.x / tileSize;
   let playerRow = player.y / tileSize;
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      if (maze[r][c] !== 1) continue; // only walls
+      if (maze[r][c] !== 1) continue;
 
-      // Distance from this wall tile to the player, in tiles
       let d = dist(c, r, playerCol, playerRow);
-
-      // Falloff: 1 when right next to player, fading to 0 beyond PROXIMITY_RADIUS
       let proximity = constrain(map(d, 0, PROXIMITY_RADIUS, 1, 0), 0, 1);
 
-      // Blend: battery sets the overall "how bad is it" level,
-      // proximity decides how much of that shows up on THIS wall tile.
-      // Walls right next to the player fully reflect batteryTarget;
-      // far-away walls stay near 0 regardless of battery.
-      let target = batteryTarget * proximity;
+      // At 0 battery, ignore proximity entirely — every wall in the maze
+      // slams to max, not just the ones near the player
+      let target = socialBattery <= 0 ? 1 : batteryTarget * proximity;
 
       if (wallExpansion[r][c] < target) {
-        wallExpansion[r][c] = min(wallExpansion[r][c] + WALL_EXPAND_SPEED, target);
+        wallExpansion[r][c] = min(
+          wallExpansion[r][c] + WALL_EXPAND_SPEED,
+          target,
+        );
       } else if (wallExpansion[r][c] > target) {
-        wallExpansion[r][c] = max(wallExpansion[r][c] - WALL_SHRINK_SPEED, target);
+        wallExpansion[r][c] = max(
+          wallExpansion[r][c] - WALL_SHRINK_SPEED,
+          target,
+        );
       }
     }
   }
@@ -322,7 +334,7 @@ function preload() {
   laserOn = loadImage("assets/images/laserOn.png");
   laserOff = loadImage("assets/images/laserOff.png");
 
-  playerHitSound = loadSound("assets/sounds/hit.mp3")
+  playerHitSound = loadSound("assets/sounds/hit.mp3");
 
   fail = loadSound("assets/sounds/fail.mp3");
   win = loadSound("assets/sounds/win.mp3");
@@ -356,9 +368,7 @@ function updateCamera() {
   camY = lerp(camY, targetY, CAM_SMOOTHING);
 }
 
-
 function checkLaserPlayerCollision() {
-
   if (playerInvincible) return;
 
   let feetY = player.y + HITBOX_OFFSET_Y;
@@ -371,43 +381,39 @@ function checkLaserPlayerCollision() {
     let minY = min(l.y1, l.y2) - HITBOX_RADIUS;
     let maxY = max(l.y1, l.y2) + HITBOX_RADIUS;
 
-    let hit = player.x > minX && player.x < maxX && feetY > minY && feetY < maxY;
+    let hit =
+      player.x > minX && player.x < maxX && feetY > minY && feetY < maxY;
 
-  
+    if (hit) {
+      socialBattery -= LASER_DAMAGE;
 
-  if (hit) {
-    socialBattery -= LASER_DAMAGE;
-    
-    if (socialBattery < 0)
-      socialBattery = 0;
+      if (socialBattery < 0) socialBattery = 0;
 
-    // INSERT GAME OVER SCREEN
+      // INSERT GAME OVER SCREEN
 
-    playerInvincible = true;
-    invincibleTimer = INVINCIBLE_FRAMES;
+      playerInvincible = true;
+      invincibleTimer = INVINCIBLE_FRAMES;
 
-    playerHitSound.play()
+      playerHitSound.play();
 
-    hitFlashAlpha = HIT_FLASH_MAX
+      hitFlashAlpha = HIT_FLASH_MAX;
+    }
   }
-}
 }
 
 function drawRedFlash(alpha) {
   let borderSize = 30;
   noStroke();
   fill(255, 0, 0, alpha);
-  rect(0,0, width, height)
+  rect(0, 0, width, height);
 }
 
 function updateInvincibility() {
   if (playerInvincible) {
     invincibleTimer--;
-    if (invincibleTimer <= 0)
-      playerInvincible = false;
+    if (invincibleTimer <= 0) playerInvincible = false;
   }
 }
-
 
 function draw() {
   background(forest);
@@ -449,7 +455,6 @@ function draw() {
   player.update();
   resolveWallPush();
 
-
   updateLaserBeams();
   drawLaserBeams();
 
@@ -458,14 +463,12 @@ function draw() {
   checkCollectibles();
   player.draw();
 
-  
-//  This is in charge of checking whether the character is colliding with the laser, damaging their SB
-checkLaserPlayerCollision();
+  //  This is in charge of checking whether the character is colliding with the laser, damaging their SB
+  checkLaserPlayerCollision();
 
-// updateinvincibility checks if the character is invisible, if it is, then the character takesno damage 
-//    1 second, otherwise they take damage and the counter is reset to 60 FRAMES (aka 1 second)
-updateInvincibility();
-
+  // updateinvincibility checks if the character is invisible, if it is, then the character takesno damage
+  //    1 second, otherwise they take damage and the counter is reset to 60 FRAMES (aka 1 second)
+  updateInvincibility();
 
   pop();
 
@@ -473,7 +476,6 @@ updateInvincibility();
     hitFlashAlpha = max(0, hitFlashAlpha - HIT_FLASH_DECAY);
     drawRedFlash(hitFlashAlpha);
   }
-
 
   drawVignette();
 
@@ -537,7 +539,6 @@ function mousePressed() {
 function canMoveTo(x, y) {
   let feetY = y + HITBOX_OFFSET_Y;
 
-  // Check 4 points around the hitbox circle instead of a single point
   let points = [
     [x - HITBOX_RADIUS, feetY],
     [x + HITBOX_RADIUS, feetY],
@@ -553,6 +554,24 @@ function canMoveTo(x, y) {
 
     let tile = maze[row][col];
     if (tile !== 0 && tile !== 2 && tile !== 3) return false;
+
+    // NEW: also block if this point falls inside a nearby wall's expanded footprint
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        let nr = row + dr,
+          nc = col + dc;
+        if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
+        if (maze[nr][nc] !== 1) continue;
+
+        let expand = wallExpansion[nr][nc] * WALL_MAX_EXPAND;
+        let left = nc * tileSize - expand;
+        let right = nc * tileSize + tileSize + expand;
+        let top = nr * tileSize - expand;
+        let bottom = nr * tileSize + tileSize + expand;
+
+        if (px > left && px < right && py > top && py < bottom) return false;
+      }
+    }
   }
 
   return true;
@@ -592,46 +611,106 @@ function resolveWallPush() {
 function setupCollectibles() {
   collectibles = [
     // Top section
-    { col: 2, row: 1, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0},
-    { col: 10, row: 2, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 16, row: 3, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 20, row: 5, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    {
+      col: 2,
+      row: 1,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 10,
+      row: 2,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 16,
+      row: 3,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 20,
+      row: 5,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
 
     // Middle section
-    { col: 3, row: 8, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 8, row: 9, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 16, row: 9, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    {
+      col: 3,
+      row: 8,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 8,
+      row: 9,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 16,
+      row: 9,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
 
     // Bottom section
-    { col: 5, row: 10, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 12, row: 11, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 17, row: 11, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
-    { col: 22, row: 12, collected: false, frame: floor(random(FIREFLY.numFrames)),frameTimer: 0 },
+    {
+      col: 5,
+      row: 10,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 12,
+      row: 11,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 17,
+      row: 11,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
+    {
+      col: 22,
+      row: 12,
+      collected: false,
+      frame: floor(random(FIREFLY.numFrames)),
+      frameTimer: 0,
+    },
   ];
 }
 function updateFireflies() {
   for (let item of collectibles) {
-
     if (item.collected) continue;
 
     item.frameTimer++;
 
     if (item.frameTimer >= FIREFLY.animSpeed) {
-
       item.frameTimer = 0;
 
-      item.frame =
-        (item.frame + 1) %
-        FIREFLY.numFrames;
+      item.frame = (item.frame + 1) % FIREFLY.numFrames;
     }
   }
 }
 function drawCollectibles() {
-
   imageMode(CENTER);
 
   for (let item of collectibles) {
-
     if (item.collected) continue;
 
     let x = item.col * tileSize + tileSize / 2;
@@ -652,7 +731,7 @@ function drawCollectibles() {
       sx,
       sy,
       FIREFLY.frameWidth,
-      FIREFLY.frameHeight
+      FIREFLY.frameHeight,
     );
   }
 }
@@ -678,12 +757,16 @@ function drawVignette() {
   let ctx = drawingContext;
 
   let gradient = ctx.createRadialGradient(
-    width / 2, height / 2, height / 4,  
-    width / 2, height / 2, height / 1.1  
+    width / 2,
+    height / 2,
+    height / 4,
+    width / 2,
+    height / 2,
+    height / 1.1,
   );
 
-  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");  
-  gradient.addColorStop(1, "rgba(0, 0, 0, 2)");  
+  gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
+  gradient.addColorStop(1, "rgba(0, 0, 0, 2)");
 
   ctx.save();
   ctx.fillStyle = gradient;
@@ -727,8 +810,11 @@ function drawMaze() {
 
   if (socialBattery <= 0) {
     socialBattery = 0;
-    gameOver = true;
-    fail.play();
+    trappedTimer++;
+    if (trappedTimer >= TRAPPED_DELAY) {
+      gameOver = true;
+      fail.play();
+    }
   }
 }
 
@@ -742,7 +828,11 @@ function drawSocialBar() {
   textSize(15);
   text("LVL 1: Make your way to school!", 50, 24);
   textSize(15);
-  text("Fireflies: " + collectedCount + " / " + collectibles.length, 50, height - 34);
+  text(
+    "Fireflies: " + collectedCount + " / " + collectibles.length,
+    50,
+    height - 34,
+  );
 
   textAlign(RIGHT, TOP);
   fill(255);
@@ -932,6 +1022,7 @@ function drawLoseScreen() {
 function restartGame() {
   socialBattery = 100;
   gameOver = false;
+  trappedTimer = 0;
 
   // Reset collectible progress
   collectedCount = 0;
