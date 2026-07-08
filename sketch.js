@@ -47,7 +47,7 @@ let hitFlashAlpha = 0;
 const HIT_FLASH_MAX = 150;
 const HIT_FLASH_DECAY = 8;
 
-const HITBOX_RADIUS = 6;
+const HITBOX_RADIUS = 8;
 const HITBOX_OFFSET_Y = 9;
 
 let lasers = [
