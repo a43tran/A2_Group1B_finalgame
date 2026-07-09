@@ -974,7 +974,7 @@ function drawMaze() {
         }
         // Exit to school block
         else if (tile === 3) {
-          image(school, col * tileSize, row * tileSize, tileSize, tileSize);
+          image(school, col * tileSize, row * tileSize, tileSize, tileSize);Sr
         }
       }
     }
@@ -1032,6 +1032,10 @@ function drawSocialBar() {
 }
 
 // LASERS
+//  Here is the function that is in charge of checking whether or not the
+//     player is colliding with the laser beams. If they are, their 
+//     social battery is decreased by 10. If they are standing in the
+//     laser than they can only take damage once every second.
 function checkLaserPlayerCollision() {
   if (playerInvincible) return;
 
@@ -1052,8 +1056,6 @@ function checkLaserPlayerCollision() {
       socialBattery -= LASER_DAMAGE;
 
       if (socialBattery < 0) socialBattery = 0;
-
-      // INSERT GAME OVER SCREEN
 
       playerInvincible = true;
       invincibleTimer = INVINCIBLE_FRAMES;
