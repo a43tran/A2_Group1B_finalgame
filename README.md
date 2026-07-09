@@ -65,20 +65,20 @@ Another planned improvement our group is considering is adding more purpose to t
 | `assets/sounds/bgmusic.mp3`[8]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/sounds/hit.mp3`[9]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 |                                   |                                                                                            |
-| `assets/images/character.png`     | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/dirt.png`          | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/images/firefly.png`       | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/fireflybadge.png`  | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |        
-| `assets/images/forest.png`        | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/homescreen.png`    | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/images/character.png`     | Made with Gemini 3.5 Flash                                                                 |
+| `assets/images/dirt.png`          | Made with Gemini 3.5 Flash                                                                 |
+| `assets/images/firefly.png`       | Made with Gemini 3.5 Flash                                                                 |
+| `assets/images/fireflybadge.png`  | Made with Gemini 3.5 Flash                                                                 |        
+| `assets/images/forest.png`        | Made with Gemini 3.5 Flash                                                                 |
+| `assets/images/homescreen.png`    | Made with Gemini 3.5 Flash and ChatGPT                                                     |
 | `assets/images/house.png`         | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/images/HUD.png`           | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 | `assets/images/laserOff.png`      | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/images/laserOn.png`       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/images/level1complete.png`      | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/laserOn.png`       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-
-oh wait wth why is it still there ermmm
+| `assets/images/level1complete.png`| Made with Gemini 3.5 Flash and ChatGPT                                                     |
+| `assets/images/restartscreen.png` | Made with Gemini 3.5 Flash and ChatGPT                                                     |
+| `assets/images/school.png`        | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/trees.png`         | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 
 ## References
 
