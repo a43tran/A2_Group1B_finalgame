@@ -18,7 +18,7 @@ Illuminate uses its mechanics and visual design to help players understand both 
 ## Setup and Interaction Instructions
 To run the sketch locally, open `index.html` in Google Chrome using Live Server. To play via GitHub Pages, visit the link provided on the submission page.
 
-**Game Objective**
+### Game Objective
 The goal of Illuminate's first level is to find and make your way to the school, while simultaneously avoiding all the laser cameras that will decrease the social battery bar, essentially the health bar, if you make contact. The lower your social battery is, the slower you walk, the more caved in the walls are, and the more vulnerable you are to colliding into the laser cameras given your slowed walking speed. Scattered around the map, you can locate glowing fireflies that once all collected, will grant you a special badge. Collecting fireflies is not mandatory to arrive and access the school.
 
 **Controls:** 
