@@ -70,7 +70,7 @@ Another planned improvement our group is considering is adding more purpose to t
 | `assets/sounds/bgmusic.mp3`[9]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/sounds/hit.mp3`[10]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 |                                   |                                                                                            |
-| `assets/images/character.png`     | Gemini 3.5 Flash                                                                           |
+| `assets/images/character.png`     | Gemini 3.5 Flash and ChatGPT                                                                         |
 | `assets/images/dirt.png`          | Gemini 3.5 Flash                                                                           |
 | `assets/images/firefly.png`       | Gemini 3.5 Flash                                                                           |
 | `assets/images/fireflybadge.png`  | Gemini 3.5 Flash                                                                           |        
