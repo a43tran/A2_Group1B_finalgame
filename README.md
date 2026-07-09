@@ -51,13 +51,16 @@ Based on our Mid-Term game showcase, a planned improvement we intend to implemen
 **Fireflies Boost Social Battery**
 Another planned improvement our group is considering is adding more purpose to the firefly collectibles as they initially served as an optional collectible players can accumulate as they navigate through different routes in the maze. Rather than having eleven fireflies scattered throughout the map, Karen and Jueun suggested decreasing this amount and re-interpreting the fireflies as a collectible that boosts the player’s social battery bar, providing a form of light energy that energizes the player. By incorporating this feature, players not only have a greater incentive to collect the fireflies, but also gain the opportunity to replenish their depleted social battery and reach the endpoint without having to restart again. We also will remove the firefly counter to maintain a sense of mystery/unknown where players are not aware of how many fireflies/social battery boosters are available. Through this iteration, discovering the fireflies becomes more meaningful as encountering these glowing creatures restores the damage that players have taken rather than existing simply as a collectible count. 
 
+
+
+
 ## Assets
 
-|               File                |                                   Source                                  |
-|-----------------------------------|---------------------------------------------------------------------------|
-| `assets/sounds/walking.mp3`[1]    | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                    |
-| `assets/sounds/collect.mp3`[4]    | floraphonic, 90s Game UI 6 - Pixabay.com                                  |
-| `assets/sounds/win.mp3`[5]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                          |
+|               File                |                                             Source                                        |
+|-----------------------------------|--------------------------------------------------------------------------------------------|
+| `assets/sounds/walking.mp3`[1]    | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
+| `assets/sounds/collect.mp3`[4]    | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
+| `assets/sounds/win.mp3`[5]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
 | `assets/sounds/fail.mp3`[6]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 | `assets/sounds/bgmusic.mp3`[8]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay. com |
 | `assets/sounds/hit.mp3`[9]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                      |       
