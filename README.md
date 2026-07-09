@@ -65,20 +65,20 @@ Another planned improvement our group is considering is adding more purpose to t
 | `assets/sounds/bgmusic.mp3`[8]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
 | `assets/sounds/hit.mp3`[9]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 |                                   |                                                                                            |
-| `assets/images/character.png`     | Made with Gemini 3.5 Flash                                                                 |
-| `assets/images/dirt.png`          | Made with Gemini 3.5 Flash                                                                 |
-| `assets/images/firefly.png`       | Made with Gemini 3.5 Flash                                                                 |
-| `assets/images/fireflybadge.png`  | Made with Gemini 3.5 Flash                                                                 |        
-| `assets/images/forest.png`        | Made with Gemini 3.5 Flash                                                                 |
-| `assets/images/homescreen.png`    | Made with Gemini 3.5 Flash and ChatGPT                                                     |
-| `assets/images/house.png`         | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/HUD.png`           | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/images/laserOff.png`      | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/laserOn.png`       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/images/level1complete.png`| Made with Gemini 3.5 Flash and ChatGPT                                                     |
-| `assets/images/restartscreen.png` | Made with Gemini 3.5 Flash and ChatGPT                                                     |
-| `assets/images/school.png`        | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/images/trees.png`         | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/images/character.png`     | Gemini 3.5 Flash                                                                           |
+| `assets/images/dirt.png`          | Gemini 3.5 Flash                                                                           |
+| `assets/images/firefly.png`       | Gemini 3.5 Flash                                                                           |
+| `assets/images/fireflybadge.png`  | Gemini 3.5 Flash                                                                           |        
+| `assets/images/forest.png`        | Gemini 3.5 Flash                                                                           |
+| `assets/images/homescreen.png`    | Gemini 3.5 Flash and ChatGPT                                                               |
+| `assets/images/house.png`         | Gemini 3.5 Flash                                                                           |
+| `assets/images/HUD.png`           | Gemini 3.5 Flash                                                                           |
+| `assets/images/laserOff.png`      | Gemini 3.5 Flash                                                                           |
+| `assets/images/laserOn.png`       | Gemini 3.5 Flash                                                                           |
+| `assets/images/level1complete.png`| Gemini 3.5 Flash and ChatGPT                                                               |
+| `assets/images/restartscreen.png` | Gemini 3.5 Flash and ChatGPT                                                               |
+| `assets/images/school.png`        | Gemini 3.5 Flash                                                                           |
+| `assets/images/trees.png`         | Gemini 3.5 Flash                                                                           |
 
 ## References
 
@@ -99,6 +99,3 @@ Another planned improvement our group is considering is adding more purpose to t
 [8] Montogoronto. 2025. A night full of stars - Peaceful electronic 8-bit/piano track. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/music/ambient-a-night-full-of-stars-peaceful-electronic-8-bitpiano-track-321551/
 
 [9] Pixabay. 2026. Retro Hurt Sound 01. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/retro-hurt-sound-01-474779/
-
-
-
