@@ -2,7 +2,7 @@
 **Group 1B**
 
 
-## Illuminate
+## Game Description
 
 
 
@@ -56,18 +56,31 @@ Another planned improvement our group is considering is adding more purpose to t
 
 ## Assets
 
-|               File                |                                             Source                                        |
+|               File                |                                             Source                                         |
 |-----------------------------------|--------------------------------------------------------------------------------------------|
 | `assets/sounds/walking.mp3`[1]    | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
 | `assets/sounds/collect.mp3`[4]    | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
 | `assets/sounds/win.mp3`[5]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
 | `assets/sounds/fail.mp3`[6]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/sounds/bgmusic.mp3`[8]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay. com |
-| `assets/sounds/hit.mp3`[9]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                      |       
+| `assets/sounds/bgmusic.mp3`[8]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/sounds/hit.mp3`[9]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+|                                   |                                                                                            |
+| `assets/images/character.png`     | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/dirt.png`          | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/images/firefly.png`       | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/fireflybadge.png`  | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |        
+| `assets/images/forest.png`        | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/homescreen.png`    | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/images/house.png`         | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/HUD.png`           | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/images/laserOff.png`      | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/laserOn.png`       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/images/level1complete.png`      | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/images/laserOn.png`       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+
+oh wait wth why is it still there ermmm
 
 ## References
-
-Bibliography
 
 [1] Abdalrahman_bm. 2025. 8-bit gravel footsteps 1. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/sound-effects/film-special-effects-8-bit-gravel-footsteps-1-408582/
 
