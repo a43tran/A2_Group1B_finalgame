@@ -7,7 +7,7 @@
 
 
 ## Design Rationale
-Illuminate uses its mechanics and visual design to help players understand both the gameplay and Faith’s experience with social anxiety. The Social Battery bar functions as a familiar health indicator, making it immediately clear when the player is in danger and providing constant feedback about their current state. As the bar decreases, Faith’s movement speed slows and the maze walls gradually close in, creating a direct connection between the player’s performance and the increasing sense of pressure. This design allows players to physically experience feelings of restriction and overwhelm rather than simply reading about them. The laser cameras act as clear affordances for danger, with their bright red beams signaling areas that should be avoided. Beyond their gameplay function, they represent the fear of being watched, judged, and scrutinized by others, which is a common experience associated with social anxiety. Hidden eyes within the forest environment further reinforce this feeling of observation throughout the level. GameFlow principles are supported through gradual learning, clear objectives, and continuous feedback. Players are introduced to the controls and mechanics through the tutorial before facing more difficult challenges, while the Social Battery bar, collectible counter, and achievement badge consistently communicate progress. The optional firefly collectibles provide an additional goal that rewards exploration with a badge achievement, encouraging engagement without preventing players from reaching the school and completing the level.
+Illuminate uses its mechanics and visual design to help players understand both the gameplay and Faith’s experience with social anxiety. The Social Battery bar functions as a familiar health indicator, making it immediately clear when the player is in danger and providing constant feedback about their current state. As the bar decreases, Faith’s movement speed slows and the maze walls gradually close in, creating a direct connection between the player’s performance and the increasing sense of pressure. This design allows players to physically experience feelings of restriction and overwhelm rather than simply reading about them. The laser cameras act as clear affordances for danger, with their bright red beams signaling areas that should be avoided. Beyond their gameplay function, they represent the fear of being watched, judged, and scrutinized by others, which is a common experience associated with social anxiety [3]. Hidden eyes within the forest environment further reinforce this feeling of observation throughout the level. GameFlow principles are supported through gradual learning, clear objectives, and continuous feedback [10]. Players are introduced to the controls and mechanics through the tutorial before facing more difficult challenges, while the Social Battery bar, collectible counter, and achievement badge consistently communicate progress. The optional firefly collectibles provide an additional goal that rewards exploration with a badge achievement, encouraging engagement without preventing players from reaching the school and completing the level.
 
 
 ## Setup and Interaction Instructions
@@ -59,11 +59,11 @@ Another planned improvement our group is considering is adding more purpose to t
 |               File                |                                             Source                                         |
 |-----------------------------------|--------------------------------------------------------------------------------------------|
 | `assets/sounds/walking.mp3`[1]    | Abdalrahman_bm, 8-bit gravel footsteps 1 - Pixabay.com                                     |
-| `assets/sounds/collect.mp3`[4]    | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
-| `assets/sounds/win.mp3`[5]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
-| `assets/sounds/fail.mp3`[6]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
-| `assets/sounds/bgmusic.mp3`[8]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
-| `assets/sounds/hit.mp3`[9]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/sounds/collect.mp3`[5]    | floraphonic, 90s Game UI 6 - Pixabay.com                                                   |
+| `assets/sounds/win.mp3`[6]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                                           |
+| `assets/sounds/fail.mp3`[7]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
+| `assets/sounds/bgmusic.mp3`[9]    | Montogoronto, A night full of stars - Peaceful electronic 8-bit/piano track - Pixabay.com  |
+| `assets/sounds/hit.mp3`[10]        | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com                     |
 |                                   |                                                                                            |
 | `assets/images/character.png`     | Gemini 3.5 Flash                                                                           |
 | `assets/images/dirt.png`          | Gemini 3.5 Flash                                                                           |
@@ -84,18 +84,22 @@ Another planned improvement our group is considering is adding more purpose to t
 
 [1] Abdalrahman_bm. 2025. 8-bit gravel footsteps 1. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/sound-effects/film-special-effects-8-bit-gravel-footsteps-1-408582/
 
-[2] Cleveland Clinic. 2026. Social Anxiety Disorder. Cleveland Clinic. Retrieved July 8, 2026 from https://my.clevelandclinic.org/health/diseases/22709-social-anxiety
+[2] Cardona-Rivera, R. E., and Young, R. M. 2013. A Cognitivist Theory of Affordances for Games. Proceedings of DiGRA 2013 Conference: DeFragging Game Studies. Digital Games Research Association (DiGRA), Atlanta, GA, USA.
 
-[3] Karen Cochrane. 2026. Week 3 Code Examples. Retrieved July 8, 2026 from https://learn.uwaterloo.ca/d2l/le/content/1265815/viewContent/6544450/View
+[3] Cleveland Clinic. 2026. Social Anxiety Disorder. Cleveland Clinic. Retrieved July 8, 2026 from https://my.clevelandclinic.org/health/diseases/22709-social-anxiety
 
-[4] floraphonic. 2024. 90s Game UI 6. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-90s-game-ui-6-185099/
+[4] Karen Cochrane. 2026. Week 3 Code Examples. Retrieved July 8, 2026 from https://learn.uwaterloo.ca/d2l/le/content/1265815/viewContent/6544450/View
 
-[5] Latent-Rick. 2026. Retro Arcade Level Up. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/musical-retro-arcade-level-up-552982/
+[5] floraphonic. 2024. 90s Game UI 6. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-90s-game-ui-6-185099/
 
-[6] Make_More_Sound. 2023. 8 Bit Video Game Lose Sound - Version 1. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-8-bit-video-game-lose-sound-version-1-145828/
+[6] Latent-Rick. 2026. Retro Arcade Level Up. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/musical-retro-arcade-level-up-552982/
 
-[7] Mayo Clinic . 2021. Social anxiety disorder (social phobia). Mayo Clinic. Retrieved July 8, 2026 from https://www.mayoclinic.org/diseases-conditions/social-anxiety-disorder/symptoms-causes/syc-20353561
+[7] Make_More_Sound. 2023. 8 Bit Video Game Lose Sound - Version 1. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/film-special-effects-8-bit-video-game-lose-sound-version-1-145828/
 
-[8] Montogoronto. 2025. A night full of stars - Peaceful electronic 8-bit/piano track. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/music/ambient-a-night-full-of-stars-peaceful-electronic-8-bitpiano-track-321551/
+[8] Mayo Clinic . 2021. Social anxiety disorder (social phobia). Mayo Clinic. Retrieved July 8, 2026 from https://www.mayoclinic.org/diseases-conditions/social-anxiety-disorder/symptoms-causes/syc-20353561
 
-[9] Pixabay. 2026. Retro Hurt Sound 01. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/retro-hurt-sound-01-474779/
+[9] Montogoronto. 2025. A night full of stars - Peaceful electronic 8-bit/piano track. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/music/ambient-a-night-full-of-stars-peaceful-electronic-8-bitpiano-track-321551/
+
+[10] Pixabay. 2026. Retro Hurt Sound 01. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/retro-hurt-sound-01-474779/
+
+[11] Sweetser, P. and Wyeth, P. 2005. GameFlow: A Model for Evaluating Player Enjoyment in Games. Computers in Entertainment 3, 3 (2005), 3:1–3:24. DOI:https://doi.org/10.1145/1077246.1077253
