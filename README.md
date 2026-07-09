@@ -2,12 +2,17 @@
 **Group 1B**
 
 
+
 ## Game Description
+Illuminate is a 2D maze adventure that explores the experience of social anxiety disorder through a fantasy-styled gameplay. Players must help Faith overcome challenges she faces without her social battery bar dropping to zero, representing mental and emotional energy required when handling overwhelming social situations. 
+
+Players control Faith through the maze using the WASD keys while collecting glowing fireflies scattered across the map to achieve a badge. Along the journey, players must carefully navigate the environment, ensuring that her social battery doesn’t deplete as she encounters situations that increase her anxiety. The game combines exploration, resource management, and storytelling to create an engaging game experience, showcasing the challenges faced by individuals with social anxiety disorder. 
 
 
 
 ## Design Rationale
 Illuminate uses its mechanics and visual design to help players understand both the gameplay and Faith’s experience with social anxiety. The Social Battery bar functions as a familiar health indicator, making it immediately clear when the player is in danger and providing constant feedback about their current state. As the bar decreases, Faith’s movement speed slows and the maze walls gradually close in, creating a direct connection between the player’s performance and the increasing sense of pressure. This design allows players to physically experience feelings of restriction and overwhelm rather than simply reading about them. The laser cameras act as clear affordances for danger, with their bright red beams signaling areas that should be avoided. Beyond their gameplay function, they represent the fear of being watched, judged, and scrutinized by others, which is a common experience associated with social anxiety [3]. Hidden eyes within the forest environment further reinforce this feeling of observation throughout the level. GameFlow principles are supported through gradual learning, clear objectives, and continuous feedback [10]. Players are introduced to the controls and mechanics through the tutorial before facing more difficult challenges, while the Social Battery bar, collectible counter, and achievement badge consistently communicate progress. The optional firefly collectibles provide an additional goal that rewards exploration with a badge achievement, encouraging engagement without preventing players from reaching the school and completing the level.
+
 
 
 ## Setup and Interaction Instructions
