@@ -1,5 +1,6 @@
 # A2: Mid-Term Game
-# Group 1B
+**Group 1B**
+
 
 ## Illuminate
 
@@ -57,7 +58,7 @@ Another planned improvement our group is considering is adding more purpose to t
 | `assets/images/collect.mp3`[4]    | floraphonic, 90s Game UI 6 - Pixabay.com                                  |
 | `assets/images/win.mp3`[5]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                          |
 | `assets/images/fail.mp3`[6]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com    |
-| `assets/images/win.mp3`[5]        | Latent-Rick, Retro Arcade Level Up - Pixabay.com                          |
+| `assets/images/bgmusic.mp3`[8]    | Montogoronto, Retro Arcade Level Up - Pixabay.com                          |
 | `assets/images/fail.mp3`[6]       | Make_More_Sound, 8 Bit Video Game Lose Sound - Version 1 - Pixabay.com    |       
 
 ## References
@@ -79,7 +80,7 @@ Make_More_Sound. 2023. 8 Bit Video Game Lose Sound - Version 1. Pixabay.com. Ret
 [7]
 Mayo Clinic . 2021. Social anxiety disorder (social phobia). Mayo Clinic. Retrieved July 8, 2026 from https://www.mayoclinic.org/diseases-conditions/social-anxiety-disorder/symptoms-causes/syc-20353561
 [8]
-Montogoronto. 2025. A night full of stars - Peaceful electronic 8-bit/piano track | Royalty-free Music. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/music/ambient-a-night-full-of-stars-peaceful-electronic-8-bitpiano-track-321551/
+Montogoronto. 2025. A night full of stars - Peaceful electronic 8-bit/piano track. Pixabay.com. Retrieved July 9, 2026 from https://pixabay.com/music/ambient-a-night-full-of-stars-peaceful-electronic-8-bitpiano-track-321551/
 [9]
 Pixabay. 2026. Retro Hurt Sound 01. Pixabay.com. Retrieved June 22, 2026 from https://pixabay.com/sound-effects/retro-hurt-sound-01-474779/
 
