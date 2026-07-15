@@ -974,7 +974,7 @@ function drawMaze() {
         }
         // Exit to school block
         else if (tile === 3) {
-          image(school, col * tileSize, row * tileSize, tileSize, tileSize);Sr
+          image(school, col * tileSize, row * tileSize, tileSize, tileSize);
         }
       }
     }
